@@ -1,6 +1,6 @@
 Readme file for Arduino tinyServo84 Library
 
-tinyServo84 is a library that can control up to 8 servos on PORTA of the ATtiny84 microprocessor.
+tinyServo84 is a library that can control up to 11 servos on pin bank A and B of the ATtiny84 microprocessor.
 
 This library was originally created as a sketch because I ignored PWM capabilities when I ordered a PCB. Using PA2, PA3, and PA4
 to control servos, I quickly realized the regular servo library wouldn't do the job. So that's why I wrote this one.<p>
