@@ -54,12 +54,12 @@ void loop() {
   }*/
 
   // Uncomment for potentiometer control:
-  //int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE); // take pot reading & remap to angle.
+  //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
   //myServos.setServo(0, location);  // write new location to servo 0
   //delay(50);              // wait a bit to reduce jittering
 
   // Uncomment for potentiometer control of servo0 with slower movement:
-  //int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE);
+  //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
   //moveTo(location, 5);  // move to new location, delay=4 ms between steps
 
 
