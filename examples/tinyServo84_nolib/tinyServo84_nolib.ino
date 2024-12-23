@@ -104,7 +104,7 @@ void loop() {
   setServo(1, location);  // write new location to servo1
   setServo(2, location);  // write new location to servo2
   delay(50);              // wait a bit to reduce jittering
-  /*
+  */
 
   // Uncomment for potentiometer control of all servos with slower movement:
   //int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE);
