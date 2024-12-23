@@ -66,7 +66,7 @@ void loop() {
   // are reading noisy potentiometer readings (suggested: ~10 per servo enabled).
   //myServos.servo_timeout_check(0);  // if servos are inactive, stop Timer1 (less trouble for other routines)
 
-  //Uncomment to rock all servos simultaneously, at full speed.
+  // Uncomment to rock all servos simultaneously, at full speed.
   for (int i = 0; i < NSVO; i++) {
     setServo(i, 0);
   }
@@ -76,6 +76,10 @@ void loop() {
   }
   delay(1000);
 
+  // Uncomment to rock all servos smoothly using moveTo(), with a 10ms delay between steps:
+  //moveTo(0, 0, 0, 10);
+  //moveTo(SVOMAXANGLE, SVOMAXANGLE, SVOMAXANGLE, 10);
+  
   // Uncomment to rock servo1 very slowly
   /*for (int i = 0; i < SVOMAXANGLE; i++) {
     setServo(1, i);
@@ -94,10 +98,6 @@ void loop() {
     delay(1000);
   }*/
 
-  // Uncomment to rock all servos smoothly through 0-SVOMAXANGLE, simultaneously.
-  //moveTo(0,0,0,5);
-  //moveTo(SVOMAXANGLE,SVOMAXANGLE,SVOMAXANGLE,5);
-
   // Uncomment for potentiometer control:
   /*int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE); // take pot reading & remap to angle.
   setServo(0, location);  // write new location to servo0
@@ -109,7 +109,6 @@ void loop() {
   // Uncomment for potentiometer control of all servos with slower movement:
   //int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE);
   //moveTo(location, location, location, 5);  // move to new location, delay=4 ms between steps
-
 }
 
 void attachServo(byte servo_num) { // function to attach servo
@@ -145,10 +144,10 @@ void homeServos() {  // function to home servos
   delay(1000);  // wait for servos to home
 }
 
-// Change s0..s2 to match dimensions of NSVO (# of servos)
+
 void moveTo(int s0, int s1, int s2, int wait) {  // function for controlling all servos slowly, simultaneously.
-  // wait=0: as fast as possible. do not use wait < 10 msec.
-  // Change structure of moveTo based on # servos needed (add coordinates)
+  // wait=0: as fast as possible.
+  // Note: Change structure of moveTo arguments to match # servos (add coordinates s3, s4 ... as needed).
   int loc[NSVO] = { s0, s1, s2 };  // create array for loc’ns
   static int pos[NSVO];            // remembers last value of pos
   if (wait == 0) {                 // if wait=0, move as fast as possible
