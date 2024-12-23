@@ -1,0 +1,103 @@
+// 1servo.ino: Example sketch for tinyServo84
+// tinyServo84.h version 1.0.0
+// Author: D. Dubins
+// Date: 23-Dec-24
+// Controlling 3 servos with ATtiny84 (clock frequency=8MHz)
+// The following pin numbers are used by the library:
+// servo #0..7: PA0..PA7 (8 servos)
+// servo #8..10: PB0..PB2 (3 servos)
+
+#include "tinyServo84.h"
+
+// Change these values to suit your application:
+#define NSERVO 3          // number of servos to control (up to 11)
+#define SVOMAXANGLE 179   // maximum angle for servo.
+#define SVOMINPULSE 500   // minimum pulse width in microseconds for servo signal (0 degrees)
+#define SVOMAXPULSE 2500  // maximum pulse width in microseconds for servo signal (for maximum angle)
+#define SVOTIMEOUT 500    // timeout in ms to disable servos.
+
+tinyServo84 myServos;  // declare object called myServos of class tinyServo84
+
+void setup() {
+  myServos.setCTC();
+  for (int i = 0; i < NSERVO; i++) {
+    myServos.attachServo(i);  // by default, servo0 will be attached to PA0.
+  }
+}
+
+void loop() {
+  // Uncomment for disabling Timer1 if the servos don't receive a different signal, after
+  // SVOTIMEOUT milliseconds.
+  // This servo_timeout_check() is optional. Temporarily turning off Timer1 will free the mcu to do other things.
+  // The function argument is the change in pulse width signal that will result in servos being re-enabled.
+  // (Default=0, which means any change in signal will wake up servos).
+  // The only reason you might need a number tolerance is if you would like to disable the timer, and you
+  // are reading noisy potentiometer readings (suggested: ~10 per servo enabled).
+  //myServos.servo_timeout_check(0);  // if servos are inactive, stop Timer1 (less trouble for other routines)
+  
+  // Uncomment for potentiometer control:
+  //int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE); // take pot reading & remap to angle.
+  //myServos.setServo(0, location);  // write new location to servo 0
+  //myServos.setServo(1, location);  // write new location to servo 1
+  //myServos.setServo(2, location);  // write new location to servo 2
+  //delay(50);                      // wait a bit to reduce jittering
+
+  // Uncomment for potentiometer control of all servos with slower movement:
+  //int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE);
+  //myServos.moveTo(location, location, location, 5);  // move to new location, delay=4 ms between steps
+
+  //Uncomment to rock servo 1 slowly
+  /*for (int i = 0; i < SVOMAXANGLE; i++) {
+    myServos.setServo(1, i);
+    delay(500); // 0.5s delay should let you see each angle
+  }
+  for (int i = SVOMAXANGLE; i >=0; i--) {
+    myServos.setServo(1, i);
+    delay(500);
+  }*/
+
+  //Uncomment to rock all servos through 0-SVOMAXANGLE sequentially.
+  /*for (int i = 0; i < NSERVO; i++) {
+    myServos.setServo(i, 0);
+    delay(1000);
+    myServos.setServo(i, SVOMAXANGLE);
+    delay(1000);
+  }*/
+
+  //Uncomment for aggressive movement of all servos simultaneously.
+  for (int i = 0; i < NSERVO; i++) {
+    myServos.setServo(i, 0);
+  }
+  delay(1000);
+  for (int i = 0; i < NSERVO; i++) {
+    myServos.setServo(i, SVOMAXANGLE);
+  }
+  delay(1000);
+}
+
+// Change s0..s2 to match number of servos attached.
+void moveTo(int s0, int s1, int s2, int wait) {  // routine for controlling all servos slowly, simultaneously.
+  // wait=0: as fast as possible. do not use wait < 10 msec.
+  // Change structure of moveTo based on # servos needed (add coordinates)
+  int loc[NSERVO] = { s0, s1, s2 };  // create array for loc’ns
+  static int pos[NSERVO];            // remembers last value of pos
+  if (wait == 0) {                   // if wait=0, move as fast as possible
+    for (int i = 0; i < NSERVO; i++) {
+      myServos.setServo(i, loc[i]);  // write new position to servos
+    }
+  } else {
+    int dev = 0;  // to track deviation
+    do {
+      dev = 0;
+      for (int i = 0; i < NSERVO; i++) {  // moves servos one step
+        if (loc[i] > pos[i]) pos[i]++;    // add 1 to pos[i]
+        if (loc[i] < pos[i]) pos[i]--;    // subtr 1 from pos[i]
+        dev += abs(pos[i] - loc[i]);      // calculate deviation
+      }
+      for (int i = 0; i < NSERVO; i++) {
+        myServos.setServo(i, pos[i]);  // write new position to servos
+      }
+      delay(wait);      // slow down movement
+    } while (dev > 0);  // stop when location attained
+  }                     // end if
+}
