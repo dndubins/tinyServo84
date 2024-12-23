@@ -22,9 +22,9 @@
 #define SVOMINPULSE 500   // minimum pulse width in microseconds for servo signal (0 degrees). Default: 500
 #define SVOMAXPULSE 2500  // maximum pulse width in microseconds for servo signal (for maximum angle). Default: 2500
 #define SVOTIMEOUT 500    // timeout in ms to disable servos. Should be long enough to attain setpoint.
-#define SVO1 PB0          // starting pin in bank for servo 0. PA0 for first pin in BANKA, PB0 for first pin in BANKB (default:PA0). 
-#define DATAREG DDRB      // DDRA for BANKA, DDRB for BANKB (default: DDRA)
-#define PORTREG PORTB     // PORTA for BANKA, PORTB for BANKB (default: DDRA)
+#define SVO1 PA0          // starting pin in bank for servo 0. PA0 for first pin in BANKA, PB0 for first pin in BANKB (default:PA0). 
+#define DATAREG DDRA      // DDRA for BANKA, DDRB for BANKB (default: DDRA)
+#define PORTREG PORTA     // PORTA for BANKA, PORTB for BANKB (default: DDRA)
 
 //This sketch allows you to make servo0 what you want.
 //Make sure you declare your servo pins sequentially.
