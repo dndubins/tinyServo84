@@ -35,7 +35,7 @@ void loop() {
   // are reading noisy potentiometer readings (suggested: ~10 per servo enabled).
   //myServos.servo_timeout_check(0);  // if servos are inactive, stop Timer1 (less trouble for other routines)
 
-  // Uncomment to rock all servos at full speed.
+  // Uncomment to rock all servos simultaneously, at full speed.
   for (int i = 0; i < NSERVO; i++) {
     myServos.setServo(i, 0);
   }
@@ -45,7 +45,7 @@ void loop() {
   }
   delay(1000);
 
-  // Uncomment to rock all servos using moveTo(), with a 10ms delay between steps:
+  // Uncomment to rock all servos smoothly using moveTo(), with a 10ms delay between steps:
   //moveTo(0, 0, 0, 10);
   //moveTo(SVOMAXANGLE, SVOMAXANGLE, SVOMAXANGLE, 10);
   
@@ -59,7 +59,7 @@ void loop() {
     delay(500);
   }*/
 
-  // Uncomment to rock all servos through 0-SVOMAXANGLE sequentially.
+  // Uncomment to rock all servos at full speed through 0-SVOMAXANGLE, sequentially.
   /*for (int i = 0; i < NSERVO; i++) {
     myServos.setServo(i, 0);
     delay(1000);
@@ -78,13 +78,11 @@ void loop() {
   // Uncomment for potentiometer control of all servos with smoother movement:
   //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
   //myServos.moveTo(location, location, location, 5);  // move to new location, delay=4 ms between steps
-  
 }
 
-// Change s0..s2 to match number of servos attached.
 void moveTo(int s0, int s1, int s2, int wait) {  // routine for controlling all servos slowly, simultaneously.
-  // wait=0: as fast as possible. do not use wait < 10 msec.
-  // Change structure of moveTo based on # servos needed (add coordinates)
+  // wait=0: as fast as possible.
+  // Note: Change structure of moveTo arguments to match # servos (add coordinates s3, s4 ... as needed).
   int loc[NSERVO] = { s0, s1, s2 };  // create array for loc’ns
   static int pos[NSERVO];            // remembers last value of pos
   if (wait == 0) {                   // if wait=0, move as fast as possible
