@@ -11,6 +11,7 @@ to control servos, I quickly realized the regular servo library wouldn't do the 
 
 The functions available in the library include:
 
+```
 attachServo(byte servo_num); // to attach the servo
 detachServo(byte servo_num); // to detach the servo, which also sets the corresponding signal pin to INPUT mode
 setServo(byte servo_num, int angle); // to set the servo to a specific angle
@@ -20,9 +21,10 @@ servo_timeout_check(in tol); // a timer for servo inactivity to temporarily disa
 enableTimerInterrupt(); // re-enable the timer
 disableTimerInterrupt(); // disable the timer
 setCTC(); // sets the timer to CTC mode at 50Hz rollover
+```
 
-To use the library, copy the download to the Library directory.
+To use the library, copy the download to the Library directory.<p>
  
 Technical notes:
--The library only currently works on the ATTiny84.
--The library assumes a clock speed of 8MHz.
+- tinyServo84 only currently works on the ATTiny84.
+- The library assumes a clock speed of 8MHz.
