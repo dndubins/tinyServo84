@@ -5,7 +5,7 @@
 // Transferability: This is a very specific sketch! Will only work on the ATtiny84.
 // However, if you have a good understanding of timers and CTC mode, you can adapt it to
 // non-PWM pins of other MCUs as well.
-// Authors: D.Dubins, Perplexity.AI, and ChatGPT (mostly Perplexity.AI)
+// Authors: D.Dubins
 // Date: 19-Dec-24
 // Last Updated: 23-Dec-24
 //
