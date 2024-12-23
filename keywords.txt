@@ -1,0 +1,8 @@
+tinyServo84	KEYWORD1
+attachServo	KEYWORD2
+detachServo	KEYWORD2
+setServo	KEYWORD2
+homeServo	KEYWORD2
+servo_timeout_check	KEYWORD2
+enableTimerInterrupt	KEYWORD2
+disableTimerInterrupt	KEYWORD2
