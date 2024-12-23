@@ -35,17 +35,6 @@ void loop() {
   // are reading noisy potentiometer readings (suggested: ~10 per servo enabled).
   //myServos.servo_timeout_check(0);  // if servos are inactive, stop Timer1 (less trouble for other routines)
   
-  // Uncomment for potentiometer control:
-  //int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE); // take pot reading & remap to angle.
-  //myServos.setServo(0, location);  // write new location to servo 0
-  //myServos.setServo(1, location);  // write new location to servo 1
-  //myServos.setServo(2, location);  // write new location to servo 2
-  //delay(50);                      // wait a bit to reduce jittering
-
-  // Uncomment for potentiometer control of all servos with slower movement:
-  //int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE);
-  //myServos.moveTo(location, location, location, 5);  // move to new location, delay=4 ms between steps
-
   //Uncomment to rock servo 1 slowly
   /*for (int i = 0; i < SVOMAXANGLE; i++) {
     myServos.setServo(1, i);
@@ -73,6 +62,18 @@ void loop() {
     myServos.setServo(i, SVOMAXANGLE);
   }
   delay(1000);
+
+  // Uncomment for potentiometer control:
+  //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
+  //myServos.setServo(0, location);  // write new location to servo 0
+  //myServos.setServo(1, location);  // write new location to servo 1
+  //myServos.setServo(2, location);  // write new location to servo 2
+  //delay(50);                      // wait a bit to reduce jittering
+
+  // Uncomment for potentiometer control of all servos with slower movement:
+  //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
+  //myServos.moveTo(location, location, location, 5);  // move to new location, delay=4 ms between steps
+  
 }
 
 // Change s0..s2 to match number of servos attached.
