@@ -61,8 +61,6 @@ void loop() {
   // Uncomment for potentiometer control of servo0 with slower movement:
   //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
   //moveTo(location, 5);  // move to new location, delay=4 ms between steps
-
-
 }
 
 void moveTo(int s0, int wait) { // routine to move servo slower (more smoothly)
