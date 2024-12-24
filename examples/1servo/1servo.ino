@@ -20,7 +20,7 @@ tinyServo84 myServos;     // declare object called myServos of class tinyServo84
 void setup() {
   myServos.setCTC();
   myServos.attachServo(0); // attach servo0 (PA0)
-  myServos.homeServos(); // home servo0
+  myServos.homeServos();   // home any attached servos
 }
 
 void loop() {
