@@ -3,9 +3,10 @@
 // Author: D. Dubins
 // Date: 23-Dec-24
 // Controlling 3 servos on any digital pins in BANK A and/or B from PA0 to PB2 on ATtiny84 (clock frequency=8MHz)
-// The following pin numbers are used by the library:
-// servo #0..7: PA0..PA7 (8 servos)
-// servo #8..10: PB0..PB2 (3 servos)
+// The library maps specific servo numbers to the following pins:
+// servo 0: PA0   servo 3: PA3   servo 6: PA6   servo 9: PB1
+// servo 1: PA1   servo 4: PA4   servo 7: PA7   servo 10: PB2
+// servo 2: PA2   servo 5: PA5   servo 8: PB0
 
 #include "tinyServo84.h"
 
@@ -21,7 +22,7 @@ tinyServo84 myServos;  // declare object called myServos of class tinyServo84
 void setup() {
   myServos.setCTC();
   for (int i = 0; i < NSERVO; i++) {
-    myServos.attachServo(i);  // by default, servo0 will be attached to PA0
+    myServos.attachServo(i);  // by default, servo 0 will be attached to PA0
   }
   myServos.homeServos();             // home any attached servos
 }
