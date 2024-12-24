@@ -17,7 +17,7 @@
  *  Servo 2 Yellow Wire - PA4
  */
 
-#define NSVO 3     // number of servos to control
+#define NSVO 3  // number of servos to control
 // Servo Parameters:
 byte sPin[NSVO] = { 2, 3, 4 };  // pin #s for servos PA2(D2), PA3(D3), PA4(D4)
 #define SVOMAXANGLE 179         // maximum angle for servo.
@@ -31,7 +31,7 @@ void setup() {
 }
 
 void loop() {
-  
+
   // Uncomment to move all 3 servos smoothly to different locations, using moveTo():
   /*moveTo(0, 179, 0, 1);      //go to 0,179,0. Larger last number = slower movement.
   moveTo(90, 90, 179, 1);    //go to 90,90,179
@@ -55,14 +55,14 @@ void loop() {
   //servoWriteSame(location, 100);  // write location to all 3 servos
 
   // Uncomment to rock second servo only at full speed:
-  servoWrite(sPin[1], 0, 500); // send servo 1 to angle 0, duration = 500 msec
-  servoWrite(sPin[1], 179, 500); // send servo 1 to angle 179, duration = 500 msec
+  servoWrite(sPin[1], 0, 500);    // send servo 1 to angle 0, duration = 500 msec
+  servoWrite(sPin[1], 179, 500);  // send servo 1 to angle 179, duration = 500 msec
 }
 
 void moveTo(int s0, int s1, int s2, int wait) {  // routine for controlling 3 servos slowly, simultaneously.
   // wait=0: as fast as possible. do not use wait < 10 msec.
   // Change structure of moveTo based on # servos needed (add coordinates)
-  int loc[NSVO] = { s0, s1, s2 };                      //create array for loc’ns
+  int loc[NSVO] = { s0, s1, s2 };                       //create array for loc’ns
   static int pos[NSVO];                                 // remembers last value of pos
   int dev = 0;                                          // to track deviation
   loc[0] = constrain(loc[0], 0, SVOMAXANGLE);           // limits for servo 0
@@ -87,9 +87,9 @@ void homeServos() {         // even servo motors can be homed
   servoWriteSame(0, 1000);  // send the same signal to all 3 servos
 }
 
-void servoWrite(byte pin, byte angle, unsigned int dur) {  // write a signal to a single servo for time dur (msec)
-// 50Hz custom duty cycle routine for servo control
-// This routine should be portable to other MCUs.
+void servoWrite(byte pin, byte angle, unsigned int dur) {                   // write a signal to a single servo for time dur (msec)
+                                                                            // 50Hz custom duty cycle routine for servo control
+                                                                            // This routine should be portable to other MCUs.
   unsigned long timer1 = millis();                                          // start the timer
   unsigned int tON = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);  // pulse width usually 1000-2000us (full range 500-2500us)
   unsigned int tOFF = 20000 - tON;                                          // a 50 Hz pulse has a period of 20,000 us. tOFF should be 20,000-tON.
@@ -102,12 +102,12 @@ void servoWrite(byte pin, byte angle, unsigned int dur) {  // write a signal to 
 }
 
 void servoWriteSame(byte angle, unsigned int dur) {  // write the same signal to all 3 servos
-// This routine was written for the ATtiny84. Consult PORT architecture if using for other MCUs.
+                                                     // This routine was written for the ATtiny84. Consult PORT architecture if using for other MCUs.
   unsigned long timer1 = millis();
   unsigned int tON = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);
   unsigned int tOFF = 20000 - tON;  // a 50 Hz pulse has a period of 20,000 us. tOFF should be 20,000-tON.
   while (millis() - timer1 < dur) {
-    for(int i=0;i<3;i++)digitalWrite(sPin[i],HIGH); // set all servo pins HIGH
+    for (int i = 0; i < 3; i++) digitalWrite(sPin[i], HIGH);  // set all servo pins HIGH
     // Faster: (but ATtiny84 specific)
     //PORTA |= (1 << PA2) | (1 << PA3) | (1 << PA4);  // set pins PA2, PA3, and PA4 HIGH at the same time
     delayMicroseconds(tON);
@@ -119,7 +119,7 @@ void servoWriteSame(byte angle, unsigned int dur) {  // write the same signal to
 }
 
 void servoWriteAll(byte s0, byte s1, byte s2, unsigned int dur) {  // write different signals to all servos (more efficient)
-// This routine was written for the ATtiny84. Consult PORT architecture if using for other MCUs.
+                                                                   // This routine was written for the ATtiny84. Consult PORT architecture if using for other MCUs.
   unsigned long timer1 = millis();
   unsigned int tON0 = map(s0, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);  // tON for Servo 0.
   unsigned int tON1 = map(s1, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);  // tON for Servo 1.
@@ -127,14 +127,14 @@ void servoWriteAll(byte s0, byte s1, byte s2, unsigned int dur) {  // write diff
   while (millis() - timer1 < dur) {                                       // repeat for time dur in msec
     unsigned long timer2 = micros();                                      // start the microsecond timer
     PORTA |= (1 << PA2) | (1 << PA3) | (1 << PA4);                        // set pins PA2, PA3, and PA4 HIGH at the same time
-    while (micros() - timer2 < 20000) {  // a 50 Hz pulse has a period of 20,000 us.
-      if (micros() - timer2 > tON0) digitalWrite(sPin[0],LOW);  // turn off PA2 at the right time
-      if (micros() - timer2 > tON1) digitalWrite(sPin[1],LOW);  // turn off PA3 at the right time
-      if (micros() - timer2 > tON2) digitalWrite(sPin[2],LOW);  // turn off PA4 at the right time
-      // Faster (but ATtiny84 specific):
-      //if (micros() - timer2 > tON0) PORTA &= ~(1 << PA2);  // turn off PA2 at the right time
-      //if (micros() - timer2 > tON1) PORTA &= ~(1 << PA3);  // turn off PA3 at the right time
-      //if (micros() - timer2 > tON2) PORTA &= ~(1 << PA4);  // turn off PA4 at the right time\     
+    while (micros() - timer2 < 20000) {                                   // a 50 Hz pulse has a period of 20,000 us.
+      if (micros() - timer2 > tON0) digitalWrite(sPin[0], LOW);           // turn off PA2 at the right time
+      if (micros() - timer2 > tON1) digitalWrite(sPin[1], LOW);           // turn off PA3 at the right time
+      if (micros() - timer2 > tON2) digitalWrite(sPin[2], LOW);           // turn off PA4 at the right time
+                                                                          // Faster (but ATtiny84 specific):
+                                                                          //if (micros() - timer2 > tON0) PORTA &= ~(1 << PA2);  // turn off PA2 at the right time
+                                                                          //if (micros() - timer2 > tON1) PORTA &= ~(1 << PA3);  // turn off PA3 at the right time
+                                                                          //if (micros() - timer2 > tON2) PORTA &= ~(1 << PA4);  // turn off PA4 at the right time
     }
   }
 }
