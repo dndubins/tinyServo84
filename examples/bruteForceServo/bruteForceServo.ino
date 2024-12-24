@@ -3,8 +3,9 @@
  *  Last Modified: 19-Dec-24
  *  This sketch does not require any additional libraries and does not use Timer1. It is a blocking version of the library. 
  *  This sketch inspired me to write tinyServo84.
- *  If you replace the direct port commands with digitalWrite(), then this sketch should work reasonably well on any microcontroller where delayMicroseconds()
- *  functions.
+ *  This sketch should work reasonably well on any microcontroller where delayMicroseconds() works.
+ *  Optional direct port commands are included for the ATtiny84, for pins PA2, PA3, and PA4. These can be changed to any other digital pin
+ *  capable of OUTPUT mode.
  *
  *  Connections:
  *  ============
@@ -106,11 +107,13 @@ void servoWriteSame(byte angle, unsigned int dur) {  // write the same signal to
   unsigned int tON = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);
   unsigned int tOFF = 20000 - tON;  // a 50 Hz pulse has a period of 20,000 us. tOFF should be 20,000-tON.
   while (millis() - timer1 < dur) {
-    //for(int i=0;i<3;i++)digitalWrite(sPin[i],HIGH); // set all servo pins HIGH
-    PORTA |= (1 << PA2) | (1 << PA3) | (1 << PA4);  // set pins PA2, PA3, and PA4 HIGH at the same time
+    for(int i=0;i<3;i++)digitalWrite(sPin[i],HIGH); // set all servo pins HIGH
+    // Faster: (but ATtiny84 specific)
+    //PORTA |= (1 << PA2) | (1 << PA3) | (1 << PA4);  // set pins PA2, PA3, and PA4 HIGH at the same time
     delayMicroseconds(tON);
-    //for (int i = 0; i < 3; i++) digitalWrite(sPin[i], LOW);  // set all servo pins LOW
-    PORTA &= ~((1 << PA2) | (1 << PA3) | (1 << PA4));  // set pins PA2, PA3, and PA4 LOW at the same time
+    for (int i = 0; i < 3; i++) digitalWrite(sPin[i], LOW);  // set all servo pins LOW
+    // Faster: (but ATtiny84 specific)
+    //PORTA &= ~((1 << PA2) | (1 << PA3) | (1 << PA4));  // set pins PA2, PA3, and PA4 LOW at the same time
     delayMicroseconds(tOFF);
   }
 }
@@ -125,9 +128,13 @@ void servoWriteAll(byte s0, byte s1, byte s2, unsigned int dur) {  // write diff
     unsigned long timer2 = micros();                                      // start the microsecond timer
     PORTA |= (1 << PA2) | (1 << PA3) | (1 << PA4);                        // set pins PA2, PA3, and PA4 HIGH at the same time
     while (micros() - timer2 < 20000) {  // a 50 Hz pulse has a period of 20,000 us.
-      if (micros() - timer2 > tON0) PORTA &= ~(1 << PA2);  // turn off PA2 at the right time
-      if (micros() - timer2 > tON1) PORTA &= ~(1 << PA3);  // turn off PA3 at the right time
-      if (micros() - timer2 > tON2) PORTA &= ~(1 << PA4);  // turn off PA4 at the right time
+      if (micros() - timer2 > tON0) digitalWrite(sPin[0],LOW);  // turn off PA2 at the right time
+      if (micros() - timer2 > tON1) digitalWrite(sPin[1],LOW);  // turn off PA3 at the right time
+      if (micros() - timer2 > tON2) digitalWrite(sPin[2],LOW);  // turn off PA4 at the right time
+      // Faster (but ATtiny84 specific):
+      //if (micros() - timer2 > tON0) PORTA &= ~(1 << PA2);  // turn off PA2 at the right time
+      //if (micros() - timer2 > tON1) PORTA &= ~(1 << PA3);  // turn off PA3 at the right time
+      //if (micros() - timer2 > tON2) PORTA &= ~(1 << PA4);  // turn off PA4 at the right time\     
     }
   }
 }
