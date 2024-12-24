@@ -120,7 +120,7 @@ void attachServo(byte servo_num) { // function to attach servo
 
 void detachServo(byte servo_num) {  // function to detach servo
   if (servo_num < NSVO) {
-    servo_attached[servo_num] = false;
+    servo_attached[servo_num] = false;      // Set servo_attached to false
     PORTREG &= ~(1 << (SVO1 + servo_num));  // Set servo pin low
     DATAREG &= ~(1 << (SVO1 + servo_num));   // Set servo pin to INPUT mode (less chatter when not doing anything)
   }
@@ -132,8 +132,8 @@ void setServo(byte servo_num, int angle) { // function to set servo position
   if (pulse_width != servo_PWs[servo_num] && servo_attached[servo_num]) {  // Disable interrupts only if signal changes and servo is attached
     cli();                                                                 // Disable interrupts. It's best to update volatile global variables with interrupts diabled.
     servo_PWs[servo_num] = pulse_width;                                    // Store new pulse_width in servo_PWs
-    sei();
-  }  // Enable interrupts. Spend as little time in "disabled interrupt land" as possible.
+    sei();                                                                 // Enable interrupts. Spend as little time in "disabled interrupt land" as possible.
+  }
 }
 
 void homeServos() {  // function to home servos
@@ -224,26 +224,26 @@ void enableTimerInterrupt() {  // run this if you'd like to (re)enable CTC timer
 }
 
 void servo_timeout_check(int tol) { // tol is added for potentiometer control. Default should be zero.
-  static bool timer1_enabled = false;
-  static int totalLast;
-  static unsigned long servo_timer;
+  static bool timer1_enabled = false; // keep track of whether timer1 is enabled
+  static int totalLast;               // keep track of the last total
+  static unsigned long servo_timer;   // keep track of the time duration since the servo last moved
   int total = 0;
   for (int i = 0; i < NSVO; i++) {
     if (servo_attached[i]) {
-      total += servo_PWs[i];
+      total += servo_PWs[i];          // add up the total pulse widths for the enabled servos. We are using this as a marker.
     }
   }
-  if (abs(total - totalLast) > tol) {  // if changes outside tolerance
-    servo_timer = millis();
-    if (!timer1_enabled) {
-      enableTimerInterrupt();	       // restart Timer1
-      timer1_enabled = true;           // set enabled flag to true
+  if (abs(total - totalLast) > tol) {  // if total pulse width changed outside the defined tolerance (new setpoint requested)
+    servo_timer = millis();            // reset servo_timer
+    if (!timer1_enabled) {             // if Timer1 is disabled
+      enableTimerInterrupt();	         // restart Timer1
+      timer1_enabled = true;           // set Timer1 enabled flag to true (reduces needles switching)
     }
   }
-  totalLast = total;
+  totalLast = total;                   // remember the total for next time
 
   if (((millis() - servo_timer) > SVOTIMEOUT) && timer1_enabled) {
-    disableTimerInterrupt(); // disable Timer1
-    timer1_enabled = false;  // set enabled flag to false
+    disableTimerInterrupt();           // disable Timer1
+    timer1_enabled = false;            // set Timer1 enabled flag to false
   }
 }
