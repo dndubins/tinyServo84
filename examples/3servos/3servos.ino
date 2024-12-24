@@ -23,7 +23,7 @@ void setup() {
   for (int i = 0; i < NSERVO; i++) {
     myServos.attachServo(i);  // by default, servo0 will be attached to PA0
   }
-  homeServos();             // home any attached servos
+  myServos.homeServos();             // home any attached servos
 }
 
 void loop() {
