@@ -17,6 +17,7 @@
 
 unsigned int tinyServo84::servo_PWs[NSVO] = { 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500 };  // pulse-width of mid-points of each servo
 bool tinyServo84::servo_attached[NSVO] = { false, false, false, false, false, false, false, false, false, false, false }; // each pin starts out unattached
+bool tinyServo84::timer1_enabled = false; // to keep track if Timer1 is enabled
 
 tinyServo84::tinyServo84() {
 }
@@ -44,6 +45,7 @@ void tinyServo84::detachServo(byte servo_num) { // function to detach servo
 } 
 
 void tinyServo84::setServo(byte servo_num, int angle) {
+  if(!tinyServo84::timer1_enabled)tinyServo84::enableTimerInterrupt();     // enable Timer1 in case it timed out
   int pulse_width = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);  // convert angle to pulse width in microseconds
   pulse_width = constrain(pulse_width, SVOMINPULSE, SVOMAXPULSE);          // constrain pulse width to min and max
   if (pulse_width != tinyServo84::servo_PWs[servo_num] && tinyServo84::servo_attached[servo_num]) { // Disable interrupts only if signal changes and servo is attached
@@ -62,7 +64,6 @@ void tinyServo84::homeServos() {  // function to home servos
 }
 
 void tinyServo84::servo_timeout_check(int tol) { // tol is added for potentiometer control. Default should be zero.
-  static bool timer1_enabled = false;     // keep track of whether timer1 is enabled
   static int totalLast;                   // keep track of the last total
   static unsigned long servo_timer;       // keep track of the time duration since the servo last moved
   int total = 0;
@@ -71,27 +72,20 @@ void tinyServo84::servo_timeout_check(int tol) { // tol is added for potentiomet
       total += tinyServo84::servo_PWs[i];  // add up the total pulse widths for the enabled servos. We are using this as a marker.
     }
   }
-  if (abs(total - totalLast) > tol) {  // if total pulse width changed outside the defined tolerance (new setpoint requested)
-    servo_timer = millis();            // reset servo_timer
-    if (!timer1_enabled) {             // if Timer1 is disabled
-      enableTimerInterrupt();	       // restart Timer1
-      timer1_enabled = true;           // set Timer1 enabled flag to true (reduces needles switching)
-    }
+  if (((millis() - servo_timer) > SVOTIMEOUT) && tinyServo84::timer1_enabled) {
+    disableTimerInterrupt(); // disable Timer1
   }
   totalLast = total;                    // remember the total for next time
-
-  if (((millis() - servo_timer) > SVOTIMEOUT) && timer1_enabled) {
-    disableTimerInterrupt(); // disable Timer1
-    timer1_enabled = false;  // set Timer1 enabled flag to false
-  }
 }
 
 void tinyServo84::enableTimerInterrupt() {
-  TIMSK1 |= (1 << OCIE1A);
+  TIMSK1 |= (1 << OCIE1A);   // enable Timer1
+  tinyServo84::timer1_enabled = true; 
 }
 
 void tinyServo84::disableTimerInterrupt() {
-  TIMSK1 &= ~(1 << OCIE1A);
+  TIMSK1 &= ~(1 << OCIE1A);  // disable Timer1
+  tinyServo84::timer1_enabled = false;
 }
 
 void tinyServo84::setCTC() {
@@ -128,4 +122,3 @@ ISR(TIM1_COMPA_vect) {
     }
   }
 }
-
