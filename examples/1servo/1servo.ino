@@ -22,7 +22,7 @@ tinyServo84 myServos;     // declare object called myServos of class tinyServo84
 void setup() {
   myServos.setCTC();
   myServos.attachServo(motor1); // attach motor1
-  myServos.homeServos(); // home servo0
+  myServos.homeServos(); // home all attached servos
 }
 
 void loop() {
@@ -32,19 +32,19 @@ void loop() {
   // trigger the Timer to re-enable. (Default=0, which means ANY change in signal will re-enable the servos).
   // The only reason you might need a number tolerance is if you would like to disable the timer, and you
   // are reading noisy potentiometer readings (suggested: ~10 microseconds per servo enabled).
-  //myServos.servo_timeout_check(0);  // if servos are inactive, stop Timer1 (less trouble for other routines)
+  myServos.servo_timeout_check(0);  // if servos are inactive, stop Timer1 (less trouble for other routines)
   
-  //Uncomment for rocking servo 0 at full speed.
-  /*myServos.setServo(motor1, 0);
+  // Uncomment for rocking motor1 at full speed.
+  myServos.setServo(motor1, 0);
   delay(1000);
   myServos.setServo(motor1, SVOMAXANGLE);
-  delay(1000);*/
+  delay(1000);
 
-  // Uncomment to rock servo 0 using moveTo(), with a 10ms delay between steps:
+  // Uncomment to rock motor1 using moveTo(), with a 10ms delay between steps:
   //moveTo(motor1, 0, 10);
   //moveTo(motor1, SVOMAXANGLE, 10);
 
-  // Uncomment to move servo 0 slowly (0.5 second steps)
+  // Uncomment to move motor1 slowly (0.5 second steps)
   /*for (int i = 0; i < SVOMAXANGLE; i++) {
     myServos.setServo(motor1, i);
     delay(500); // 0.5s delay should let you see each angle
@@ -59,9 +59,9 @@ void loop() {
   //myServos.setServo(motor1, location);  // write new location to servo 0
   //delay(50);              // wait a bit to reduce jittering
 
-  // Uncomment for potentiometer control of servo0 with smoother movement:
-  int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
-  moveTo(motor1, location, 5);  // move to new location, delay=4 ms between steps
+  // Uncomment for potentiometer control of motor1 with smoother movement:
+  //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
+  //moveTo(motor1, location, 5);  // move to new location, delay=4 ms between steps
 }
 
 void moveTo(byte servo_num, int s0, int wait) { // routine to move servo slower (more smoothly)
