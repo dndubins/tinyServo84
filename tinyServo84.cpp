@@ -1,4 +1,12 @@
 // tinyServo84.cpp file for tinyServo84.h library.
+// Control up to 11 servos from pins PA0...PA7, and PB0...PB2
+// using CTC mode of Timer1 (ATtiny84)
+// Clock speed = 8MHz
+// Transferability: This is a very specific sketch! Will only work on the ATtiny84.
+// Author: D.Dubins
+// Date: 19-Dec-24
+// Last Updated: 23-Dec-24
+//
 // The following pin numbers are used:
 // servo #0..7: PA0..PA7 (8 servos)
 // servo #8..10: PB0..PB2 (3 servos)
@@ -11,70 +19,70 @@ unsigned int tinyServo84::servo_PWs[NSVO] = { 1500, 1500, 1500, 1500, 1500, 1500
 bool tinyServo84::servo_attached[NSVO] = { false, false, false, false, false, false, false, false, false, false, false };
 
 tinyServo84::tinyServo84() {
-  // Constructor - any initialization code you need
 }
 
-void tinyServo84::attachServo(byte servo_num) {
+void tinyServo84::attachServo(byte servo_num) { // function to attach servo
   if (servo_num < 8) {
-    tinyServo84::servo_attached[servo_num] = true;
+    tinyServo84::servo_attached[servo_num] = true;   // Set servo_attached to true
     DDRA |= (1 << (PA0 + servo_num));  // Set servo pin in DDRA to OUTPUT mode
   }else if (servo_num < NSVO){
-	tinyServo84::servo_attached[servo_num] = true;
+	tinyServo84::servo_attached[servo_num] = true;  // Set servo_attached to true
     DDRB |= (1 << (PB0 + (servo_num - 8)));  // Set servo pin in DDRB to OUTPUT mode
   }
 }
 
-void tinyServo84::detachServo(byte servo_num) {
+void tinyServo84::detachServo(byte servo_num) { // function to detach servo
   if (servo_num < 8) {
-    tinyServo84::servo_attached[servo_num] = false;
+    tinyServo84::servo_attached[servo_num] = false;   // Set servo_attached to false
     PORTA &= ~(1 << (PA0 + servo_num)); // Set servo pin low
-    DDRA &= ~(1 << (PA0 + servo_num));  // Set servo pin to INPUT mode
+    DDRA &= ~(1 << (PA0 + servo_num));  // Set servo pin to INPUT mode (less chatter when not doing anything)
  } else {
     tinyServo84::servo_attached[servo_num] = false;
     PORTB &= ~(1 << (PB0 + (servo_num - 8))); // Set servo pin low
-    DDRB &= ~(1 << (PB0 + (servo_num - 8)));  // Set servo pin to INPUT mode
+    DDRB &= ~(1 << (PB0 + (servo_num - 8)));  // Set servo pin to INPUT mode (less chatter when not doing anything)
  }
 } 
 
 void tinyServo84::setServo(byte servo_num, int angle) {
-  int pulse_width = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE); // convert angle to pulse width in microseconds
-  pulse_width = constrain(pulse_width, SVOMINPULSE, SVOMAXPULSE);  // constrain pulse width to min and max
+  int pulse_width = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);  // convert angle to pulse width in microseconds
+  pulse_width = constrain(pulse_width, SVOMINPULSE, SVOMAXPULSE);          // constrain pulse width to min and max
   if (pulse_width != tinyServo84::servo_PWs[servo_num] && tinyServo84::servo_attached[servo_num]) { // Disable interrupts only if signal changes and servo is attached
-    cli();  // Disable interrupts. It's best to update volatile global variables with interrupts diabled.
-    tinyServo84::servo_PWs[servo_num] = pulse_width; // Store new pulse_width in servo_PWs
-    sei();
-  } // Enable interrupts. Spend as little time in "disabled interrupt land" as possible.
+    cli();                                                                 // Disable interrupts. It's best to update volatile global variables with interrupts diabled.
+    tinyServo84::servo_PWs[servo_num] = pulse_width;                       // Store new pulse_width in servo_PWs
+    sei();                                                                 // Enable interrupts. Spend as little time in "disabled interrupt land" as possible.
+  }
 }
 
-void tinyServo84::homeServos() {
+void tinyServo84::homeServos() {  // function to home servos
+  // Note: servo will not home unless it is first enabled.
   for (byte i = 0; i < NSVO; i++) {
-    tinyServo84::setServo(i, 90);
+    tinyServo84::setServo(i, 90);  // send all servos to middle position
   }
-  delay(1000);
+  delay(1000);  // wait for servos to home
 }
 
 void tinyServo84::servo_timeout_check(int tol) { // tol is added for potentiometer control. Default should be zero.
-  static bool timer1_enabled = false;
-  static int totalLast;
-  static unsigned long servo_timer;
+  static bool timer1_enabled = false;     // keep track of whether timer1 is enabled
+  static int totalLast;                   // keep track of the last total
+  static unsigned long servo_timer;       // keep track of the time duration since the servo last moved
   int total = 0;
   for (int i = 0; i < NSVO; i++) {
     if (tinyServo84::servo_attached[i]) {
-      total += tinyServo84::servo_PWs[i];
+      total += tinyServo84::servo_PWs[i];  // add up the total pulse widths for the enabled servos. We are using this as a marker.
     }
   }
-  if (abs(total - totalLast) > tol) {  // if changes outside tolerance
-    servo_timer = millis();
-    if (!timer1_enabled) {
+  if (abs(total - totalLast) > tol) {  // if total pulse width changed outside the defined tolerance (new setpoint requested)
+    servo_timer = millis();            // reset servo_timer
+    if (!timer1_enabled) {             // if Timer1 is disabled
       enableTimerInterrupt();	       // restart Timer1
-      timer1_enabled = true;           // set enabled flag to true
+      timer1_enabled = true;           // set Timer1 enabled flag to true (reduces needles switching)
     }
   }
-  totalLast = total;
+  totalLast = total;                    // remember the total for next time
 
   if (((millis() - servo_timer) > SVOTIMEOUT) && timer1_enabled) {
     disableTimerInterrupt(); // disable Timer1
-    timer1_enabled = false;  // set enabled flag to false
+    timer1_enabled = false;  // set Timer1 enabled flag to false
   }
 }
 
