@@ -16,11 +16,10 @@ attachServo(byte servo_num); // to attach the servo
 detachServo(byte servo_num); // to detach the servo, which also sets the corresponding signal pin to INPUT mode
 setServo(byte servo_num, int angle); // to set the servo to a specific angle
 homeServos(); // routine to home the servos
-moveTo(int s0, int s1, int s2, int s3, int s4, int s5, int s6, int wait); // enter location of each servo, and wait in msec for smoother movement
-servo_timeout_check(in tol); // a timer for servo inactivity to temporarily disable the timer
+setCTC(); // sets the timer to CTC mode at 50Hz rollover
 enableTimerInterrupt(); // re-enable the timer
 disableTimerInterrupt(); // disable the timer
-setCTC(); // sets the timer to CTC mode at 50Hz rollover
+servo_timeout_check(); // a timer for servo inactivity to temporarily disable the timer
 
 To use the library, copy the download to the Library directory.
  
