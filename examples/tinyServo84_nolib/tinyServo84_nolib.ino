@@ -55,7 +55,6 @@ void setup() {
   attachServo(0);  // pin PA0 is servo0
   attachServo(1);  // pin PA1 is servo1
   attachServo(2);  // pin PA2 is servo2
-  attachServo(3);  // pin PA3 is servo3
 
   // if you would like to detach a specific servo at any time:
   //detachServo(0); // detach servo0
