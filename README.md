@@ -1,4 +1,4 @@
-Readme file for Arduino tinyServo84 Library
+<h1>Readme file for Arduino tinyServo84 Library
 
 tinyServo84 is a library that can control up to 11 servos on pin banks A and B of the ATtiny84 microprocessor.
 
