@@ -59,6 +59,19 @@ void loop() {
   // Uncomment for potentiometer control of motor1 with smoother movement:
   //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
   //moveTo(motor1, location, 5);  // move to new location, delay=4 ms between steps
+
+  // Uncomment for potentiometer control, disabling the timer between similar readings within a tolerance
+  /*#define TOL 1 // Tolerance to ignore readings. A greater than 1 degree difference will be sent to the servo.
+  static int lastlocation;
+  int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
+  if(abs(location-lastlocation)>TOL){  // if readings are more than 1 degreee away
+    myServos.setServo(motor1, location);  // write new location to servo 0
+  }else{
+    myServos.disableTimerInterrupt(); // disable timers while waiting for a different reading
+  }
+  lastlocation=location;
+  delay(50);              // wait a bit to reduce jittering
+  */
 }
 
 void moveTo(byte servo_num, int s0, int wait) { // routine to move servo slower (more smoothly)
