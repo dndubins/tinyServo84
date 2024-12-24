@@ -2,7 +2,7 @@
 // tinyServo84.h version 1.0.0
 // Author: D. Dubins
 // Date: 23-Dec-24
-// Controlling 3 servos with ATtiny84 (clock frequency=8MHz)
+// Controlling 3 servos on any digital pins in BANK A and/or B from PA0 to PB2 on ATtiny84 (clock frequency=8MHz)
 // The following pin numbers are used by the library:
 // servo #0..7: PA0..PA7 (8 servos)
 // servo #8..10: PB0..PB2 (3 servos)
