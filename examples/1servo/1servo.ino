@@ -9,7 +9,7 @@
 // servo 2: PA2   servo 5: PA5   servo 8: PB0
 
 #include "tinyServo84.h"
-byte motor1 = 2; // motor 1 is attached to PA2
+byte motor1 = 2; // motor1 will be connected to PA2 (using guide above)
 
 // Change these values to suit your application:
 #define SVOMAXANGLE 179   // maximum angle for servo.
