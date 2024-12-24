@@ -19,6 +19,7 @@
 unsigned int tinyServo84::servo_PWs[NSVO] = { 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500 };  // pulse-width of mid-points of each servo
 bool tinyServo84::servo_attached[NSVO] = { false, false, false, false, false, false, false, false, false, false, false }; // each pin starts out unattached
 bool tinyServo84::timer1_enabled = false; // to keep track if Timer1 is enabled
+unsigned long tinyServo84::servo_tLast = 0UL; // To store the time the last servo was used (timeout function)
 
 tinyServo84::tinyServo84() {
 }
