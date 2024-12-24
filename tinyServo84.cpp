@@ -2,7 +2,7 @@
 // Control up to 11 servos from pins PA0...PA7, and PB0...PB2
 // using CTC mode of Timer1 (ATtiny84)
 // Clock speed = 8MHz
-// Transferability: This is a very specific sketch! Will only work on the ATtiny84.
+// Transferability: This is a very specific lebrary. It will only work on the ATtiny84.
 // Author: D.Dubins
 // Date: 19-Dec-24
 // Last Updated: 23-Dec-24
@@ -15,8 +15,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-unsigned int tinyServo84::servo_PWs[NSVO] = { 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500 };
-bool tinyServo84::servo_attached[NSVO] = { false, false, false, false, false, false, false, false, false, false, false };
+unsigned int tinyServo84::servo_PWs[NSVO] = { 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500 };  // pulse-width of mid-points of each servo
+bool tinyServo84::servo_attached[NSVO] = { false, false, false, false, false, false, false, false, false, false, false }; // each pin starts out unattached
 
 tinyServo84::tinyServo84() {
 }
