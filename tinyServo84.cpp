@@ -65,31 +65,6 @@ void tinyServo84::homeServos() {  // function to home servos
   delay(1000);  // wait for servos to home
 }
 
-void tinyServo84::servo_timeout_check(int tol) { // tol is added for potentiometer control. Default should be zero.
-  static int totalLast;                   // keep track of the last total
-  static unsigned long servo_timer;       // keep track of the time duration since the servo last moved
-  int total = 0;
-  for (int i = 0; i < NSVO; i++) {
-    if (tinyServo84::servo_attached[i]) {
-      total += tinyServo84::servo_PWs[i];  // add up the total pulse widths for the enabled servos. We are using this as a marker.
-    }
-  }
-  if (((millis() - servo_timer) > SVOTIMEOUT) && tinyServo84::timer1_enabled) {
-    disableTimerInterrupt(); // disable Timer1
-  }
-  totalLast = total;                    // remember the total for next time
-}
-
-void tinyServo84::enableTimerInterrupt() {
-  TIMSK1 |= (1 << OCIE1A);   // enable Timer1
-  tinyServo84::timer1_enabled = true; 
-}
-
-void tinyServo84::disableTimerInterrupt() {
-  TIMSK1 &= ~(1 << OCIE1A);  // disable Timer1
-  tinyServo84::timer1_enabled = false;
-}
-
 void tinyServo84::setCTC() {  // function to set the registers of the ATtiny84 for Timer 1 CTC mode
   // Setting up Timer1 for 1µs ticks (assuming 8MHz clock)
   cli();		  // stop interrupts
@@ -130,5 +105,21 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
 	    }
       }
     }
+  }
+}
+
+void tinyServo84::enableTimerInterrupt() {
+  TIMSK1 |= (1 << OCIE1A);   // enable Timer1
+  tinyServo84::timer1_enabled = true; 
+}
+
+void tinyServo84::disableTimerInterrupt() {
+  TIMSK1 &= ~(1 << OCIE1A);  // disable Timer1
+  tinyServo84::timer1_enabled = false;
+}
+
+void servo_timeout_check() {  // check to shut down Timer1 after SVOTIMEOUT msec have elapsed since last servo move
+  if (((millis() - tinyServo84::servo_tLast) > SVOTIMEOUT) && tinyServo84::timer1_enabled) {
+    disableTimerInterrupt();  // disable Timer1
   }
 }
