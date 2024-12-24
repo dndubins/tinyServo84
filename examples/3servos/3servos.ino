@@ -1,4 +1,4 @@
-// 1servo.ino: Example sketch for tinyServo84
+// 3servos.ino: Example sketch for tinyServo84
 // tinyServo84.h version 1.0.0
 // Author: D. Dubins
 // Date: 23-Dec-24
