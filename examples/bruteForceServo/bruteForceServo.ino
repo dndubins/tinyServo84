@@ -1,8 +1,10 @@
 /*  bruteForceServo.ino sketch (written for any non-PWM enabled pin)
  *  David Dubins 19-Dec-24
  *  Last Modified: 19-Dec-24
- *  This sketch does not require any additional libraries, and should work on any digital pin as long as the delayMicroseconds() function works for that mcu.
- *  It is a blocking version of the library. This sketch inspired me to write tinyServo84.
+ *  This sketch does not require any additional libraries and does not use Timer1. It is a blocking version of the library. 
+ *  This sketch inspired me to write tinyServo84.
+ *  If you replace the direct port commands with digitalWrite(), then this sketch should work reasonably well on any microcontroller where delayMicroseconds()
+ *  functions.
  *
  *  Connections:
  *  ============
