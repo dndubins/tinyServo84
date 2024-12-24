@@ -243,29 +243,3 @@ void servo_timeout_check() {  // tol is added for potentiometer control. Default
     disableTimerInterrupt();  // disable Timer1
   }
 }
-
-/*void servo_timeout_check(int tol) { // tol is added for potentiometer control. Default should be zero.
-  static bool timer1_enabled = false; // keep track of whether timer1 is enabled
-  static int totalLast;               // keep track of the last total
-  static unsigned long servo_timer;   // keep track of the time duration since the servo last moved
-  int total = 0;
-  for (int i = 0; i < NSVO; i++) {
-    if (servo_attached[i]) {
-      total += servo_PWs[i];          // add up the total pulse widths for the enabled servos. We are using this as a marker.
-    }
-  }
-  if (abs(total - totalLast) > tol) {  // if total pulse width changed outside the defined tolerance (new setpoint requested)
-    servo_timer = millis();            // reset servo_timer
-    if (!timer1_enabled) {             // if Timer1 is disabled
-      enableTimerInterrupt();	         // restart Timer1
-      timer1_enabled = true;           // set Timer1 enabled flag to true (reduces needles switching)
-    }
-  }
-  totalLast = total;                   // remember the total for next time
-
-  if (((millis() - servo_timer) > SVOTIMEOUT) && timer1_enabled) {
-    disableTimerInterrupt();           // disable Timer1
-    timer1_enabled = false;            // set Timer1 enabled flag to false
-  }
-}
-*/
