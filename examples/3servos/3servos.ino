@@ -27,13 +27,12 @@ void setup() {
 }
 
 void loop() {
-  // Uncomment for disabling Timer1 if the servos don't receive a different signal, after
-  // SVOTIMEOUT milliseconds.
-  // This servo_timeout_check() is optional. Temporarily turning off Timer1 will free the mcu to do other things.
-  // The function argument is the change in pulse width signal that will result in servos being re-enabled.
-  // (Default=0, which means any change in signal will wake up servos).
+  // Uncomment the timeout check below for disabling Timer1, if the servos don't receive a different signal,
+  // after SVOTIMEOUT msec. This servo_timeout_check() is optional. Temporarily turning off Timer1 will free
+  // the mcu to do other things. The function argument is the smallest change in pulse width signal that will
+  // trigger the Timer to re-enable. (Default=0, which means ANY change in signal will re-enable the servos).
   // The only reason you might need a number tolerance is if you would like to disable the timer, and you
-  // are reading noisy potentiometer readings (suggested: ~10 per servo enabled).
+  // are reading noisy potentiometer readings (suggested: ~10 microseconds per servo enabled).
   //myServos.servo_timeout_check(0);  // if servos are inactive, stop Timer1 (less trouble for other routines)
 
   // Uncomment to rock all servos simultaneously, at full speed.
