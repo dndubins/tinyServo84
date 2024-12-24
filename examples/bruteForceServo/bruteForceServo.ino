@@ -65,9 +65,7 @@ void moveTo(int s0, int s1, int s2, int wait) {  // routine for controlling 3 se
   int loc[NSVO] = { s0, s1, s2 };                       //create array for loc’ns
   static int pos[NSVO];                                 // remembers last value of pos
   int dev = 0;                                          // to track deviation
-  loc[0] = constrain(loc[0], 0, SVOMAXANGLE);           // limits for servo 0
-  loc[1] = constrain(loc[1], 0, SVOMAXANGLE);           // limits for servo 1
-  loc[2] = constrain(loc[2], 0, SVOMAXANGLE);           // limits for servo 2
+  for (int i = 0; i < NSVO; i++) loc[i] = constrain(loc[i], 0, SVOMAXANGLE);  // impose limits for servos
   if (wait == 0) {                                      // if wait is zero, do the job as fast as possible.
     servoWriteAll(pos[0], pos[1], pos[2], SVOMAXTIME);  // write new position to servos
   } else {                                              // do the job in steps
@@ -107,11 +105,11 @@ void servoWriteSame(byte angle, unsigned int dur) {  // write the same signal to
   unsigned int tON = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);
   unsigned int tOFF = 20000 - tON;  // a 50 Hz pulse has a period of 20,000 us. tOFF should be 20,000-tON.
   while (millis() - timer1 < dur) {
-    for (int i = 0; i < 3; i++) digitalWrite(sPin[i], HIGH);  // set all servo pins HIGH
+    for (int i = 0; i < NSVO; i++) digitalWrite(sPin[i], HIGH);  // set all servo pins HIGH
     // Faster: (but ATtiny84 specific)
     //PORTA |= (1 << PA2) | (1 << PA3) | (1 << PA4);  // set pins PA2, PA3, and PA4 HIGH at the same time
     delayMicroseconds(tON);
-    for (int i = 0; i < 3; i++) digitalWrite(sPin[i], LOW);  // set all servo pins LOW
+    for (int i = 0; i < NSVO; i++) digitalWrite(sPin[i], LOW);  // set all servo pins LOW
     // Faster: (but ATtiny84 specific)
     //PORTA &= ~((1 << PA2) | (1 << PA3) | (1 << PA4));  // set pins PA2, PA3, and PA4 LOW at the same time
     delayMicroseconds(tOFF);
@@ -126,15 +124,17 @@ void servoWriteAll(byte s0, byte s1, byte s2, unsigned int dur) {  // write diff
   unsigned int tON2 = map(s2, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);  // tON for Servo 2.
   while (millis() - timer1 < dur) {                                       // repeat for time dur in msec
     unsigned long timer2 = micros();                                      // start the microsecond timer
-    PORTA |= (1 << PA2) | (1 << PA3) | (1 << PA4);                        // set pins PA2, PA3, and PA4 HIGH at the same time
+    for (int i = 0; i < NSVO; i++) digitalWrite(sPin[i], HIGH);              // set all servo pins HIGH
+    // Faster (but ATtiny84 specific):
+    //PORTA |= (1 << PA2) | (1 << PA3) | (1 << PA4);                        // set pins PA2, PA3, and PA4 HIGH at the same time
     while (micros() - timer2 < 20000) {                                   // a 50 Hz pulse has a period of 20,000 us.
       if (micros() - timer2 > tON0) digitalWrite(sPin[0], LOW);           // turn off PA2 at the right time
       if (micros() - timer2 > tON1) digitalWrite(sPin[1], LOW);           // turn off PA3 at the right time
       if (micros() - timer2 > tON2) digitalWrite(sPin[2], LOW);           // turn off PA4 at the right time
-                                                                          // Faster (but ATtiny84 specific):
-                                                                          //if (micros() - timer2 > tON0) PORTA &= ~(1 << PA2);  // turn off PA2 at the right time
-                                                                          //if (micros() - timer2 > tON1) PORTA &= ~(1 << PA3);  // turn off PA3 at the right time
-                                                                          //if (micros() - timer2 > tON2) PORTA &= ~(1 << PA4);  // turn off PA4 at the right time
+    // Faster (but ATtiny84 specific):
+    //if (micros() - timer2 > tON0) PORTA &= ~(1 << PA2);  // turn off PA2 at the right time
+    //if (micros() - timer2 > tON1) PORTA &= ~(1 << PA3);  // turn off PA3 at the right time
+    //if (micros() - timer2 > tON2) PORTA &= ~(1 << PA4);  // turn off PA4 at the right time
     }
   }
 }
