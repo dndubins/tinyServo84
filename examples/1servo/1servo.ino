@@ -2,7 +2,7 @@
 // tinySero84 version 1.0.0
 // Author: D.Dubins
 // Date: 23-Dec-24
-// Controlling 1 servo on any digital pin in BANK A and/or B on ATtiny84 (clock frequency=8MHz)
+// Controlling 1 servo on any digital pin in BANK A or B from PA0 to PB2 on ATtiny84 (clock frequency=8MHz)
 // The following pin numbers are used:
 // servo #0..7: PA0..PA7 (8 servos)
 // servo #8..10: PB0..PB2 (3 servos)
