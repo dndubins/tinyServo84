@@ -16,10 +16,10 @@ class tinyServo84 {
     void detachServo(byte servo_num);
     void setServo(byte servo_num, int angle);
     void homeServos();
-    void servo_timeout_check(int tol);
+    void setCTC();
     void enableTimerInterrupt();
     void disableTimerInterrupt();
-    void setCTC();
+    void servo_timeout_check();
     static unsigned int servo_PWs[NSVO];    // Pulse widths in microseconds
     static bool servo_attached[NSVO];       // Servo attachment status
     static bool timer1_enabled;		    // To keep track if Timer1 is enabled
