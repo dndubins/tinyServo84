@@ -2,7 +2,7 @@
 // Control up to 11 servos from pins PA0...PA7, and PB0...PB2
 // using CTC mode of Timer1 (ATtiny84)
 // Clock speed = 8MHz
-// Transferability: This is a very specific lebrary. It will only work on the ATtiny84.
+// Transferability: This library is only designed to work on the ATtiny84.
 // Author: D.Dubins
 // Date: 19-Dec-24
 // Last Updated: 23-Dec-24
