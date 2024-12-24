@@ -7,9 +7,10 @@
 // Date: 19-Dec-24
 // Last Updated: 23-Dec-24
 //
-// The following pin numbers are used:
-// servo #0..7: PA0..PA7 (8 servos)
-// servo #8..10: PB0..PB2 (3 servos)
+// The library maps specific servo numbers to the following pins:
+// servo 0: PA0   servo 3: PA3   servo 6: PA6   servo 9: PB1
+// servo 1: PA1   servo 4: PA4   servo 7: PA7   servo 10: PB2
+// servo 2: PA2   servo 5: PA5   servo 8: PB0
 
 #include "tinyServo84.h"
 #include <avr/io.h>
@@ -88,35 +89,43 @@ void tinyServo84::disableTimerInterrupt() {
   tinyServo84::timer1_enabled = false;
 }
 
-void tinyServo84::setCTC() {
-  cli();
-  TCCR1A = 0;
-  TCCR1B = 0;
-  TCNT1 = 0;
-  TCCR1B = _BV(WGM12);
-  TCCR1B |= _BV(CS11) | _BV(CS10);
-  OCR1A = 2499;
-  TIMSK1 |= _BV(OCIE1A);
-  sei();
+void tinyServo84::setCTC() {  // function to set the registers of the ATtiny84 for Timer 1 CTC mode
+  // Setting up Timer1 for 1µs ticks (assuming 8MHz clock)
+  cli();		  // stop interrupts
+  TCCR1A = 0;		  // clear timer control register A
+  TCCR1B = 0;		  // clear timer control register B
+  TCNT1 = 0;		  // set counter to 0
+  TCCR1B = _BV(WGM12);    // CTC mode (Table 12-5 on ATtiny84 datasheet)
+  TCCR1B |= _BV(CS11) | _BV(CS10);  // prescaler=64
+  OCR1A = 2499;  //OCR1A=(fclk/(N*frequency))-1 (where N is prescaler).
+  TIMSK1 |= _BV(OCIE1A);  // enable timer compare
+  sei();                  // enable interrupts
+  timer1_enabled=true;    // timer1 is now enabled
 }
 
-ISR(TIM1_COMPA_vect) {
-  for (byte i = 0; i < NSVO; i++) {
-    if (tinyServo84::servo_attached[i]) {
+ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the correct widths
+  //The function micros() does not advance inside the ISR.
+  //TCNT1 starts at 0 and counts up. Each increment lasts 8 microseconds. We are going to use this as a timer.
+  //8 microseconds gives us (2500-500us)/8us =250 steps. This is fine for a 180 degree servo. For a 360 degree servo,
+  //if more steps are needed, you can set the timer to N=8, OCR1A=19999 and this will give 2000 steps, but require
+  //more attention by the ISR.
+  for (byte i = 0; i < NSVO; i++) {    
+    if (tinyServo84::servo_attached[i]) { // only turn on pin if servo attached
 	  if (i < 8) {
-        PORTA |= (1 << (PA0 + i));
+        PORTA |= (1 << (PA0 + i));  // turn on pins in PORTA
 	  } else {
-		PORTB |= (1 << (PB0 + (i - 8)));
+		PORTB |= (1 << (PB0 + (i - 8))); // turn on pins in PORTB
 	  }
     }
   }
-  while ((TCNT1 * 8) < (SVOMAXPULSE + 100)) {
+  while ((TCNT1 * 8) < (SVOMAXPULSE + 100)) {  // multiply TCNT1 by microseconds/step
+    // a 50 Hz pulse has a period of 20,000 us. We just need to make it past SVOMAXPULSE with a small buffer (100 microseconds).
     for (byte i = 0; i < NSVO; i++) {
-      if (tinyServo84::servo_attached[i] && (TCNT1 * 8) > tinyServo84::servo_PWs[i]) {
+      if (tinyServo84::servo_attached[i] && (TCNT1 * 8) > tinyServo84::servo_PWs[i]) {   // Turn off the servo pin if the timer exceeds the pulse width
 	    if (i < 8) {
-          PORTA &= ~(1 << (PA0 + i));
+          PORTA &= ~(1 << (PA0 + i));  // turn off pins in PORTA
 	    } else {
-		  PORTB &= ~(1 << (PB0 + (i - 8)));
+		  PORTB &= ~(1 << (PB0 + (i - 8)));  // turn off pins in PORTB
 	    }
       }
     }
