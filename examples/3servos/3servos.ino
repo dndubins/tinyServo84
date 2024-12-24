@@ -21,8 +21,9 @@ tinyServo84 myServos;  // declare object called myServos of class tinyServo84
 void setup() {
   myServos.setCTC();
   for (int i = 0; i < NSERVO; i++) {
-    myServos.attachServo(i);  // by default, servo0 will be attached to PA0.
+    myServos.attachServo(i);  // by default, servo0 will be attached to PA0
   }
+  homeServos();             // home any attached servos
 }
 
 void loop() {
