@@ -22,7 +22,8 @@ class tinyServo84 {
     void setCTC();
     static unsigned int servo_PWs[NSVO];    // Pulse widths in microseconds
     static bool servo_attached[NSVO];       // Servo attachment status
-	static bool timer1_enabled;				// To keep track if Timer1 is enabled
+    static bool timer1_enabled;		    // To keep track if Timer1 is enabled
+    static unsigned long servo_tLast;	    // To store the time the last servo was used (timeout function)
 };
 
 #endif
