@@ -8,6 +8,7 @@ to control servos, I quickly realized the regular servo library wouldn't do the 
 * The example sketch "1servo.ino" illustrates a few basic moves controlling 1 servo.
 * The example sketch "3servos.ino" illustrates a few basic moves controlling 3 servos.
 * For those of you who don't like libraries, I included a library-free version in a self-contained sketch, "tinyServo84_nolib.ino".
+* The example sketch "bruteForceServo.ino" should drive a servo on most digital pins regardless of the mcu. It's the sketch you know you could have written in 5 minutes.
 
 The functions available in the library include:
 
