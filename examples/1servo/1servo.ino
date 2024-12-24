@@ -60,7 +60,7 @@ void loop() {
   //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
   //moveTo(motor1, location, 5);  // move to new location, delay=4 ms between steps
 
-  // Uncomment for potentiometer control, disabling the timer between similar readings within a tolerance
+  // Uncomment for potentiometer control, disabling the timer between similar readings within a tolerance:
   /*#define TOL 1 // Tolerance to ignore readings. A greater than 1 degree difference will be sent to the servo.
   static int lastlocation;
   int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading from pin A7 & remap to angle.
