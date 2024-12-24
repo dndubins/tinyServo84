@@ -9,7 +9,6 @@
 #define SVOMAXPULSE 2500  // maximum pulse width in microseconds for servo signal (for maximum angle)
 #define SVOTIMEOUT 500    // timeout in ms to disable servos.
 
-
 class tinyServo84 {
   public:
     tinyServo84();
