@@ -14,15 +14,22 @@
 // This sketch could be modified to accommodate up to 11 servos by setting the starting servo at PA0 and sending signals
 // to both banks (A and B) instead of just one.
 
+//#define SERIALDEBUG       // comment out for no serial debugging
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
+
+#ifdef SERIALDEBUG
+#include <SoftwareSerial.h>
+SoftwareSerial mySerial(PA5, PA6);  // Start the software serial monitor on PA5(RX) and PA6(TX)
+#endif
 
 #define NSVO 3            // number of servos to control (up to 8)
 #define SVOMAXANGLE 179   // maximum angle for servo.
 #define SVOMINPULSE 500   // minimum pulse width in microseconds for servo signal (0 degrees). Default: 500
 #define SVOMAXPULSE 2500  // maximum pulse width in microseconds for servo signal (for maximum angle). Default: 2500
 #define SVOTIMEOUT 500    // timeout in ms to disable servos. Should be long enough to attain setpoint.
-#define SVO1 PA0          // starting pin in bank for servo 0. PA0 for first pin in BANKA, PB0 for first pin in BANKB (default:PA0). 
+#define SVO1 PA0          // starting pin in bank for servo 0. PA0 for first pin in BANKA, PB0 for first pin in BANKB (default:PA0).
 #define DATAREG DDRA      // DDRA for BANKA, DDRB for BANKB (default: DDRA)
 #define PORTREG PORTA     // PORTA for BANKA, PORTB for BANKB (default: DDRA)
 
@@ -33,21 +40,24 @@
 //If SVO1 is PB0 and NSVO is 3, then servo0=PB0, servo1=PB1, servo2=PB2 (do not exceed 3 servos if starting from PB0).
 //Warning: if you change SVO1, then make sure you check/change the breakpoints for the registers in the rest of the program.
 
-#define POTPIN A7  // PA7 (A7) for wiper of potentiometer pin
-
 //change the dimensions of the following arrays to match NSVO
 unsigned int servo_PWs[NSVO] = { 1500, 1500, 1500 };  // Pulse widths in microseconds (default to center position)
-bool servo_attached[NSVO] = { 0, 0, 0 };                    // Servo attachment status
+bool servo_attached[NSVO] = { 0, 0, 0 };              // Servo attachment status
+bool timer1_enabled = false;                          // to keep track if Timer1 is enabled
+unsigned long servo_tLast = 0UL;                      // To store the time the last servo was used (timeout function)
 
 void setup() {
-  setCTC();        // set CTC mode to start a 50Hz timer for the servo signals
+#ifdef SERIALDEBUG
+  mySerial.begin(9600);  // Start the software serial monitor (for debugging)
+#endif
+  setCTC();  // set CTC mode to start a 50Hz timer for the servo signals
   // attach servos here
   attachServo(0);  // pin PA0 is servo0
   attachServo(1);  // pin PA1 is servo1
   attachServo(2);  // pin PA2 is servo2
   attachServo(3);  // pin PA3 is servo3
 
-  // if you would like to detach a specific servo at any time:  
+  // if you would like to detach a specific servo at any time:
   //detachServo(0); // detach servo0
   //detachServo(1); // detach servo1
   //detachServo(2); // detach servo2
@@ -60,13 +70,9 @@ void loop() {
   // Uncomment for disabling Timer1 if the servos don't receive a different signal, after
   // SVOTIMEOUT milliseconds.
   // This servo_timeout_check() is optional. Temporarily turning off Timer1 will free the mcu to do other things.
-  // The function argument is the change in pulse width signal that will result in servos being re-enabled.
-  // (Default=0, which means any change in signal will wake up servos).
-  // The only reason you might need a number tolerance is if you would like to disable the timer, and you
-  // are reading noisy potentiometer readings (suggested: ~10 per servo enabled).
-  //myServos.servo_timeout_check(0);  // if servos are inactive, stop Timer1 (less trouble for other routines)
-
+  servo_timeout_check();  // if servos are inactive, stop Timer1 (less trouble for other routines)
   // Uncomment to rock all servos simultaneously, at full speed.
+  delay(1000);
   for (int i = 0; i < NSVO; i++) {
     setServo(i, 0);
   }
@@ -79,7 +85,7 @@ void loop() {
   // Uncomment to rock all servos smoothly using moveTo(), with a 10ms delay between steps:
   //moveTo(0, 0, 0, 10);
   //moveTo(SVOMAXANGLE, SVOMAXANGLE, SVOMAXANGLE, 10);
-  
+
   // Uncomment to rock servo1 very slowly
   /*for (int i = 0; i < SVOMAXANGLE; i++) {
     setServo(1, i);
@@ -98,22 +104,21 @@ void loop() {
     delay(1000);
   }*/
 
-  // Uncomment for potentiometer control:
-  /*int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE); // take pot reading & remap to angle.
-  setServo(0, location);  // write new location to servo0
-  setServo(1, location);  // write new location to servo1
-  setServo(2, location);  // write new location to servo2
-  delay(50);              // wait a bit to reduce jittering
-  */
+  // Uncomment for quick potentiometer control:
+  //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading on pin A7 & remap to angle.
+  //setServo(0, location);  // write new location to servo0
+  //setServo(1, location);  // write new location to servo1
+  //setServo(2, location);  // write new location to servo2
+  //delay(50);              // wait a bit to reduce jittering
 
   // Uncomment for potentiometer control of all servos with slower movement:
-  //int location = map(analogRead(POTPIN), 1023, 0, 0, SVOMAXANGLE);
+  //int location = map(analogRead(A7), 1023, 0, 0, SVOMAXANGLE); // take pot reading on pin A7 & remap to angle.
   //moveTo(location, location, location, 5);  // move to new location, delay=4 ms between steps
 }
 
-void attachServo(byte servo_num) { // function to attach servo
+void attachServo(byte servo_num) {  // function to attach servo
   if (servo_num < NSVO) {
-    servo_attached[servo_num] = true;   // Set servo_attached to true
+    servo_attached[servo_num] = true;      // Set servo_attached to true
     DATAREG |= (1 << (SVO1 + servo_num));  // Set servo pin to OUTPUT mode
   }
 }
@@ -122,11 +127,12 @@ void detachServo(byte servo_num) {  // function to detach servo
   if (servo_num < NSVO) {
     servo_attached[servo_num] = false;      // Set servo_attached to false
     PORTREG &= ~(1 << (SVO1 + servo_num));  // Set servo pin low
-    DATAREG &= ~(1 << (SVO1 + servo_num));   // Set servo pin to INPUT mode (less chatter when not doing anything)
+    DATAREG &= ~(1 << (SVO1 + servo_num));  // Set servo pin to INPUT mode (less chatter when not doing anything)
   }
 }
 
-void setServo(byte servo_num, int angle) { // function to set servo position
+void setServo(byte servo_num, int angle) {                                 // function to set servo position
+  if (!timer1_enabled) enableTimerInterrupt();                             // enable Timer1 in case it timed out
   int pulse_width = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);  // convert angle to pulse width in microseconds
   pulse_width = constrain(pulse_width, SVOMINPULSE, SVOMAXPULSE);          // constrain pulse width to min and max
   if (pulse_width != servo_PWs[servo_num] && servo_attached[servo_num]) {  // Disable interrupts only if signal changes and servo is attached
@@ -134,6 +140,7 @@ void setServo(byte servo_num, int angle) { // function to set servo position
     servo_PWs[servo_num] = pulse_width;                                    // Store new pulse_width in servo_PWs
     sei();                                                                 // Enable interrupts. Spend as little time in "disabled interrupt land" as possible.
   }
+  servo_tLast = millis();  // record time servo was last used for timeout function
 }
 
 void homeServos() {  // function to home servos
@@ -143,7 +150,6 @@ void homeServos() {  // function to home servos
   }
   delay(1000);  // wait for servos to home
 }
-
 
 void moveTo(int s0, int s1, int s2, int wait) {  // function for controlling all servos slowly, simultaneously.
   // wait=0: as fast as possible.
@@ -189,6 +195,7 @@ void setCTC() {  // function to set the registers of the ATtiny84 for Timer 1 CT
   //N=8, OCR1A=19999: 50Hz cycle, 1us per tick.
   TIMSK1 |= _BV(OCIE1A);  // enable timer compare
   sei();                  // enable interrupts
+  timer1_enabled = true;  // timer1 is now enabled
 }
 
 ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the correct widths
@@ -199,7 +206,7 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
   //more attention by the ISR.
   for (byte i = 0; i < NSVO; i++) {
     // Turn on the servo pin
-    if (servo_attached[i]) {       // only turn on pin if servo attached
+    if (servo_attached[i]) {         // only turn on pin if servo attached
       PORTREG |= (1 << (SVO1 + i));  // set correct servo pin high
     }
   }
@@ -215,15 +222,29 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
   }
 }
 
-void disableTimerInterrupt() {  // run this if you'd like to disable CTC timer interrupt. This will disable all servos.
-  TIMSK1 &= ~(1 << OCIE1A);     // Disable Timer1 Compare Match A interrupt
-}
-
 void enableTimerInterrupt() {  // run this if you'd like to (re)enable CTC timer interrupt
-  TIMSK1 |= (1 << OCIE1A);     // Enable Timer1 Compare Match A interrupt
+#ifdef SERIALDEBUG
+  mySerial.prinln("Timer1 enabled.");
+#endif
+  TIMSK1 |= (1 << OCIE1A);  // Enable Timer1 Compare Match A interrupt
+  timer1_enabled = true;
 }
 
-void servo_timeout_check(int tol) { // tol is added for potentiometer control. Default should be zero.
+void disableTimerInterrupt() {  // run this if you'd like to disable CTC timer interrupt. This will disable all servos.
+#ifdef SERIALDEBUG
+  mySerial.prinln("Timer1 disabled.");
+#endif
+  TIMSK1 &= ~(1 << OCIE1A);  // Disable Timer1 Compare Match A interrupt
+  timer1_enabled = false;
+}
+
+void servo_timeout_check() {  // tol is added for potentiometer control. Default should be zero.
+  if (((millis() - servo_tLast) > SVOTIMEOUT) && timer1_enabled) {
+    disableTimerInterrupt();  // disable Timer1
+  }
+}
+
+/*void servo_timeout_check(int tol) { // tol is added for potentiometer control. Default should be zero.
   static bool timer1_enabled = false; // keep track of whether timer1 is enabled
   static int totalLast;               // keep track of the last total
   static unsigned long servo_timer;   // keep track of the time duration since the servo last moved
@@ -247,3 +268,4 @@ void servo_timeout_check(int tol) { // tol is added for potentiometer control. D
     timer1_enabled = false;            // set Timer1 enabled flag to false
   }
 }
+*/
