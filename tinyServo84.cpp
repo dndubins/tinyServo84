@@ -54,7 +54,7 @@ void tinyServo84::setServo(byte servo_num, int angle) {
     cli();                                                                 // Disable interrupts. It's best to update volatile global variables with interrupts diabled.
     tinyServo84::servo_PWs[servo_num] = pulse_width;                       // Store new pulse_width in servo_PWs
     sei();                                                                 // Enable interrupts. Spend as little time in "disabled interrupt land" as possible.
-    servo_tLast = millis();                                                // Record time servo was last used for timeout function
+    tinyServo84::servo_tLast = millis();                                   // Record time servo was last used for timeout function
   }
 }
 
