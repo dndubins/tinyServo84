@@ -27,5 +27,5 @@ setCTC(); // sets the timer to CTC mode at 50Hz rollover
 To use the library, copy the download to the Library directory.<p>
  
 Technical notes:
-- tinyServo84 only currently works on the ATTiny84.
+- tinyServo84 only currently works on the ATTiny84, although the example sketch bruteForceServo.ino should work on other platforms.
 - The library assumes a clock speed of 8MHz.
