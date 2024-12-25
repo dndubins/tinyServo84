@@ -237,7 +237,7 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
 
 void enableTimerInterrupt() {  // run this if you'd like to (re)enable CTC timer interrupt
 #ifdef SERIALDEBUG
-  mySerial.prinln("Timer1 enabled.");
+  mySerial.println("Timer1 enabled.");
 #endif
   TIMSK1 |= (1 << OCIE1A);  // Enable Timer1 Compare Match A interrupt
   timer1_enabled = true;
@@ -245,7 +245,7 @@ void enableTimerInterrupt() {  // run this if you'd like to (re)enable CTC timer
 
 void disableTimerInterrupt() {  // run this if you'd like to disable CTC timer interrupt. This will disable all servos.
 #ifdef SERIALDEBUG
-  mySerial.prinln("Timer1 disabled.");
+  mySerial.println("Timer1 disabled.");
 #endif
   TIMSK1 &= ~(1 << OCIE1A);  // Disable Timer1 Compare Match A interrupt
   timer1_enabled = false;
