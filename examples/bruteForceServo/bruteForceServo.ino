@@ -62,8 +62,8 @@ void loop() {
 void moveTo(int s0, int s1, int s2, int wait) {  // routine for controlling 3 servos slowly, simultaneously.
   // wait=0: as fast as possible. do not use wait < 10 msec.
   // Change structure of moveTo based on # servos needed (add coordinates)
-  int loc[NSVO] = { s0, s1, s2 };                       //create array for loc’ns
-  static int pos[NSVO];                                 // remembers last value of pos
+  int loc[NSVO] = { s0, s1, s2 };                       // create array for loc’ns
+  static int pos[NSVO] = { 90, 90, 90 };                // keep track of current position. Start somewhere convenient for your setup (90 degrees in this case).
   int dev = 0;                                          // to track deviation
   for (int i = 0; i < NSVO; i++) loc[i] = constrain(loc[i], 0, SVOMAXANGLE);  // impose limits for servos
   if (wait == 0) {                                      // if wait is zero, do the job as fast as possible.
