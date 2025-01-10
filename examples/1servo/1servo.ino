@@ -76,7 +76,7 @@ void loop() {
 
 void moveTo(byte servo_num, int s0, int wait) { // routine to move servo slower (more smoothly)
   int loc = s0; // store s0 to loc
-  static int pos; // keep track of current position
+  static int pos = 90; // keep track of current position. Start somewhere convenient for your setup (90 degrees in this case).
   if (wait == 0) { // option to move as fast as possible
     myServos.setServo(servo_num, loc); // send new location to servo
   } else {
