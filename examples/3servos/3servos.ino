@@ -97,7 +97,7 @@ void moveTo(int s0, int s1, int s2, int wait) {  // routine for controlling all 
   // wait=0: as fast as possible.
   // Note: Change structure of moveTo arguments to match # servos (add coordinates s3, s4 ... as needed).
   int loc[NSERVO] = { s0, s1, s2 };  // create array for loc’ns
-  static int pos[NSERVO];            // remembers last value of pos
+  static int pos[NSERVO] = { 90, 90, 90 };  // keep track of current position. Start somewhere convenient for your setup (90 degrees in this case).
   if (wait == 0) {                   // if wait=0, move as fast as possible
     for (int i = 0; i < NSERVO; i++) {
       myServos.setServo(i, loc[i]);  // write new position to servos
