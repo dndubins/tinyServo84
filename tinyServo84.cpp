@@ -86,6 +86,10 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
   //8 microseconds gives us (2500-500us)/8us =250 steps. This is fine for a 180 degree servo. For a 360 degree servo,
   //if more steps are needed, you can set the timer to N=8, OCR1A=19999 and this will give 2000 steps, but require
   //more attention by the ISR.
+  static bool busy = false; // if ISR hasn't finished
+  if (busy) return; // prevents early firing of ISR
+  busy=true; // isr has started
+  sei(); // re-enable interrupts so USI/I2C can fire 
   for (byte i = 0; i < NSVO; i++) {    
     if (tinyServo84::servo_attached[i]) { // only turn on pin if servo attached
 	  if (i < 8) {
@@ -107,6 +111,7 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
       }
     }
   }
+  busy = false; // ISR finished. Reset the busy flag.
 }
 
 void tinyServo84::enableTimerInterrupt() {
