@@ -88,7 +88,7 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
   //more attention by the ISR.
   static bool busy = false; // if ISR hasn't finished
   if (busy) return; // prevents early firing of ISR
-  busy=true; // isr has started
+  busy=true; // ISR has started
   sei(); // re-enable interrupts so USI/I2C can fire 
   for (byte i = 0; i < NSVO; i++) {    
     if (tinyServo84::servo_attached[i]) { // only turn on pin if servo attached
