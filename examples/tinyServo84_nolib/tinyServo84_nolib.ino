@@ -67,9 +67,9 @@ void setup() {
 
 void loop() {
   // Uncomment the timeout check below for disabling Timer1, if the servos don't receive a command after
-  // SVOTIMEOUT msec. This servo_timeout_check() is optional. Temporarily turning off Timer1 will free
+  // SVOTIMEOUT msec. This servo_timeout_check(dur) is optional. Temporarily turning off Timer1 will free
   // the mcu to do other things. You can also manually suspend Timer1 with the command "disableTimerInterrupt();".
-  servo_timeout_check();  // if servos are inactive, stop Timer1 (less trouble for other routines)
+  servo_timeout_check(SVOTIMEOUT);  // if servos are inactive, stop Timer1 (less trouble for other routines)
   // Uncomment to rock all servos simultaneously, at full speed.
   for (int i = 0; i < NSVO; i++) {
     setServo(i, 0);
@@ -256,8 +256,8 @@ void disableTimerInterrupt() {  // run this if you'd like to disable CTC timer i
   timer1_enabled = false;
 }
 
-void servo_timeout_check() {  // tol is added for potentiometer control. Default should be zero.
-  if (((millis() - servo_tLast) > SVOTIMEOUT) && timer1_enabled) {
+void servo_timeout_check(unsigned long dur) {  // tol is added for potentiometer control. Default should be zero.
+  if (((millis() - servo_tLast) > dur) && timer1_enabled) {
     disableTimerInterrupt();  // disable Timer1
   }
 }
