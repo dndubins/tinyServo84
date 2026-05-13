@@ -1,7 +1,8 @@
 // 1servo.ino: Example sketch for tinyServo84
-// tinySero84 version 1.0.2
+// tinySero84 version 1.0.3
 // Author: D.Dubins
 // Date: 23-Dec-24
+// Last Updated: 13-May-26
 // Controlling 1 servo on any digital pin in BANK A or B from PA0 to PB2 on ATtiny84 (clock frequency=8MHz)
 // The library maps specific servo numbers to the following pins:
 // servo 0: PA0   servo 3: PA3   servo 6: PA6   servo 9: PB1
@@ -26,10 +27,10 @@ void setup() {
 }
 
 void loop() {
-  // Uncomment the timeout check below for disabling Timer1, if the servos don't receive a command after
-  // SVOTIMEOUT msec. This servo_timeout_check() is optional. Temporarily turning off Timer1 will free
-  // the mcu to do other things. You can also manually suspend Timer1 with the command "myServos.disableTimerInterrupt();".
-  myServos.servo_timeout_check();  // if servos are inactive, stop Timer1 (less trouble for other routines)
+  // Uncomment the timeout check below for disabling servos if they don't receive a command after dur msec.
+  // This servo_timeout_check(dur) is optional. 
+  // You can also manually suspend Timer1 with the command "myServos.disableTimerInterrupt();".
+  myServos.servo_timeout_check(10000);  // if servos are inactive, stop Timer1 (less trouble for other routines)
   
   // Uncomment for rocking motor1 at full speed.
   myServos.setServo(motor1, 0);
@@ -67,7 +68,7 @@ void loop() {
   if(abs(location-lastlocation)>TOL){  // if readings are more than 1 degreee away
     myServos.setServo(motor1, location);  // write new location to servo 0
   }else{
-    myServos.disableTimerInterrupt(); // disable timers while waiting for a different reading
+    myServos.disableTimerInterrupt(10000); // disable timers while waiting for a different reading (10 sec timeout)
   }
   lastlocation=location;
   delay(50);              // wait a bit to reduce jittering
