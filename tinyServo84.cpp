@@ -19,6 +19,8 @@
 unsigned int tinyServo84::servo_PWs[NSVO] = { 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500 };  // pulse-width of mid-points of each servo
 bool tinyServo84::servo_attached[NSVO] = { false, false, false, false, false, false, false, false, false, false, false }; // each pin starts out unattached
 bool tinyServo84::timer1_enabled = false; // to keep track if Timer1 is enabled
+volatile bool tinyServo84::servo_output_enabled = true; // logical output state
+
 unsigned long tinyServo84::servo_tLast = 0UL; // To store the time the last servo was used (timeout function)
 
 tinyServo84::tinyServo84() {
@@ -47,7 +49,8 @@ void tinyServo84::detachServo(byte servo_num) { // function to detach servo
 } 
 
 void tinyServo84::setServo(byte servo_num, int angle) {
-  if(!tinyServo84::timer1_enabled)tinyServo84::enableTimerInterrupt();     // enable Timer1 in case it timed out
+  if(!tinyServo84::timer1_enabled)tinyServo84::enableTimerInterrupt();     // enable Timer1 in case it is off (should be on)	
+  tinyServo84::servo_output_enabled = true;								   // enable servos in case they timed out
   int pulse_width = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);  // convert angle to pulse width in microseconds
   pulse_width = constrain(pulse_width, SVOMINPULSE, SVOMAXPULSE);          // constrain pulse width to min and max
   if (pulse_width != tinyServo84::servo_PWs[servo_num] && tinyServo84::servo_attached[servo_num]) { // Disable interrupts only if signal changes and servo is attached
@@ -68,7 +71,7 @@ void tinyServo84::homeServos() {  // function to home servos
 
 void tinyServo84::setCTC() {  // function to set the registers of the ATtiny84 for Timer 1 CTC mode
   // Setting up Timer1 for 1µs ticks (assuming 8MHz clock)
-  cli();		  // stop interrupts
+  cli();		      // stop interrupts
   TCCR1A = 0;		  // clear timer control register A
   TCCR1B = 0;		  // clear timer control register B
   TCNT1 = 0;		  // set counter to 0
@@ -77,7 +80,8 @@ void tinyServo84::setCTC() {  // function to set the registers of the ATtiny84 f
   OCR1A = 2499;  //OCR1A=(fclk/(N*frequency))-1 (where N is prescaler).
   TIMSK1 |= _BV(OCIE1A);  // enable timer compare
   sei();                  // enable interrupts
-  timer1_enabled=true;    // timer1 is now enabled
+  tinyServo84::timer1_enabled=true;    // timer1 is now enabled
+  tinyServo84::servo_output_enabled=true;    // servo output is now enabled
 }
 
 ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the correct widths
@@ -88,8 +92,26 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
   //more attention by the ISR.
   static bool busy = false; // if ISR hasn't finished
   if (busy) return; // prevents early firing of ISR
+  if(!tinyServo84::timer1_enabled) return; // if timer1 not enabled, leave.
   busy=true; // ISR has started
   sei(); // re-enable interrupts so USI/I2C can fire 
+  
+  // If servos are not enabled, leave safely but keep ISR alive
+  if (!tinyServo84::servo_output_enabled) {
+    for (byte i = 0; i < NSVO; i++) {
+      if (tinyServo84::servo_attached[i]) {
+        if (i < 8){ 
+			PORTA &= ~(1 << (PA0 + i));
+		} else {
+			PORTB &= ~(1 << (PB0 + (i - 8)));
+		}
+      }
+    }
+    busy = false;
+    return;
+  }
+  
+  // If servos are enabled:
   for (byte i = 0; i < NSVO; i++) {    
     if (tinyServo84::servo_attached[i]) { // only turn on pin if servo attached
 	  if (i < 8) {
@@ -124,8 +146,18 @@ void tinyServo84::disableTimerInterrupt() {
   tinyServo84::timer1_enabled = false;
 }
 
-void tinyServo84::servo_timeout_check() {  // check to shut down Timer1 after SVOTIMEOUT msec have elapsed since last servo move
-  if (((millis() - tinyServo84::servo_tLast) > SVOTIMEOUT) && tinyServo84::timer1_enabled) {
-    tinyServo84::disableTimerInterrupt();  // disable Timer1
+void tinyServo84::servo_timeout_check(unsigned long dur) {
+  // Don't start timing until a servo has actually been used
+  if (tinyServo84::servo_tLast == 0UL) return;
+
+  if ((millis() - tinyServo84::servo_tLast) > dur) {
+    if (tinyServo84::servo_output_enabled) {  // only act on the transition
+      for (byte i = 0; i < NSVO; i++) {
+        if (tinyServo84::servo_attached[i]) {
+          tinyServo84::servo_PWs[i] = 1500;
+        }
+      }
+      tinyServo84::servo_output_enabled = false;
+    }
   }
 }
