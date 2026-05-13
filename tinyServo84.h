@@ -7,7 +7,7 @@
 #define SVOMAXANGLE 179   // maximum angle for servo.
 #define SVOMINPULSE 500   // minimum pulse width in microseconds for servo signal (0 degrees)
 #define SVOMAXPULSE 2500  // maximum pulse width in microseconds for servo signal (for maximum angle)
-#define SVOTIMEOUT 500    // timeout in ms to disable servos.
+
 
 class tinyServo84 {
   public:
@@ -19,11 +19,12 @@ class tinyServo84 {
     void setCTC();
     void enableTimerInterrupt();
     void disableTimerInterrupt();
-    void servo_timeout_check();
-    static unsigned int servo_PWs[NSVO];    // Pulse widths in microseconds
-    static bool servo_attached[NSVO];       // Servo attachment status
-    static bool timer1_enabled;		    // To keep track if Timer1 is enabled
-    static unsigned long servo_tLast;	    // To store the time the last servo was used (timeout function)
+    void servo_timeout_check(unsigned long dur);		   // Timeout check for servos
+    static unsigned int servo_PWs[NSVO];       // Pulse widths in microseconds
+    static bool servo_attached[NSVO];          // Servo attachment status
+    static bool timer1_enabled;		           // To keep track if Timer1 is enabled
+	static volatile bool servo_output_enabled; // To keep track if servo output is enabled 
+    static unsigned long servo_tLast;	       // To store the time the last servo was used (timeout function)
 };
 
 #endif
