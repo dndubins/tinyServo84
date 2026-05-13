@@ -1,7 +1,8 @@
 // 3servos.ino: Example sketch for tinyServo84
-// tinyServo84.h version 1.0.2
+// tinyServo84.h version 1.0.3
 // Author: D. Dubins
 // Date: 23-Dec-24
+// Last Updated: 13-May-26
 // Controlling 3 servos on any digital pins in BANK A and/or B from PA0 to PB2 on ATtiny84 (clock frequency=8MHz)
 // The library maps specific servo numbers to the following pins:
 // servo 0: PA0   servo 3: PA3   servo 6: PA6   servo 9: PB1
