@@ -19,7 +19,7 @@ homeServos(); // routine to home the servos
 setCTC(); // sets the timer to CTC mode at 50Hz rollover
 enableTimerInterrupt(); // re-enable the timer
 disableTimerInterrupt(); // disable the timer
-servo_timeout_check(); // a timer for servo inactivity to temporarily disable the timer
+servo_timeout_check(unsigned long dur); // a timer for servo inactivity to temporarily disable the timer
 ```
 To use the library, copy the download to the Library directory.<p>
  
