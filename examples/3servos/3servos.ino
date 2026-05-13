@@ -28,10 +28,10 @@ void setup() {
 }
 
 void loop() {
-  // Uncomment the timeout check below for disabling Timer1, if the servos don't receive a command after
-  // SVOTIMEOUT msec. This servo_timeout_check() is optional. Temporarily turning off Timer1 will free
-  // the mcu to do other things. You can also manually suspend Timer1 with the command "myServos.disableTimerInterrupt();".
-  myServos.servo_timeout_check();  // if servos are inactive, stop Timer1 (less trouble for other routines)
+  // Uncomment the timeout check below for disabling servos if they don't receive a command after
+  // dur msec. This servo_timeout_check(dur) is optional. 
+  // You can also manually suspend Timer1 with the command "myServos.disableTimerInterrupt();".
+  myServos.servo_timeout_check(10000);  // if servos are inactive, stop after 10 sec
 
   // Uncomment to rock all servos simultaneously, at full speed.
   for (int i = 0; i < NSERVO; i++) {
@@ -86,7 +86,7 @@ void loop() {
     myServos.setServo(1, location);  // write new location to servo 1
     myServos.setServo(2, location);  // write new location to servo 2
   }else{
-    myServos.disableTimerInterrupt(); // disable timers while waiting for a different reading
+    myServos.disableTimerInterrupt(10000); // disable servos after 10 sec while waiting for a different reading
   }
   lastlocation=location;
   delay(50);              // wait a bit to reduce jittering
