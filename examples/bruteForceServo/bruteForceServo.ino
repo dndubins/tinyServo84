@@ -1,6 +1,6 @@
 /*  bruteForceServo.ino sketch (written for any non-PWM enabled pin)
  *  David Dubins 19-Dec-24
- *  Last Modified: 19-Dec-24
+ *  Last Modified: 13-May-26
  *  This sketch does not require any additional libraries and does not use Timer1. It is a blocking version of the library. 
  *  This sketch inspired me to write tinyServo84.
  *  This sketch should work reasonably well on any microcontroller where delayMicroseconds() works.
