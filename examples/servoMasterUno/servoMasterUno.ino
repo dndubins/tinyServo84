@@ -45,7 +45,6 @@ void setup() {
   Serial.begin(115200);           // Start serial communication
   setServos();                    // initialize sData[] with correct values (copy of this is on slave)
   Serial.println("Master ready.");  // send welcome msg
-  resetRFdata();                  // initialize RFdata to home values
 }
 
 void loop() {
@@ -236,6 +235,8 @@ bool validate_checkSum(uint8_t a[], uint8_t size) {
 }
 
 void homeArm(){ //home the arm
-  Serial.println("***** Homing arm. *****"); moveTo(sData[0].HOME,sData[1].HOME,sData[2].HOME,sData[3].HOME,sData[4].HOME,sData[5].HOME,50); //Home slowly
+  Serial.println("***** Homing arm. *****");
+
+ moveTo(sData[0].HOME,sData[1].HOME,sData[2].HOME,sData[3].HOME,sData[4].HOME,sData[5].HOME,50); //Home slowly
   Serial.println("Finished homing.");
 }
