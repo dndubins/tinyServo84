@@ -1,6 +1,6 @@
 /* servoSlave84.ino
    ATtiny84 as an I2C slave. Master sketch: servoMasterUno.ino
-   tinyServo84 version 1.0.4
+   tinyServo84.h version 1.0.4
    Author: David Dubins
    Date: 08-May-26
    Last Updated: 13-May-26
