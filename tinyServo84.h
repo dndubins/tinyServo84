@@ -6,9 +6,18 @@
 #ifndef NSVO
 	#define NSVO 11           // number of servos to control (up to 11)
 #endif
-#define SVOMAXANGLE 179   // maximum angle for servo.
-#define SVOMINPULSE 500   // minimum pulse width in microseconds for servo signal (0 degrees)
-#define SVOMAXPULSE 2500  // maximum pulse width in microseconds for servo signal (for maximum angle)
+
+#ifndef SVOMAXANGLE
+ #define SVOMAXANGLE 179   // maximum angle for servo.
+#endif
+
+#ifndef SVOMINPULSE
+ #define SVOMINPULSE 500   // minimum pulse width in microseconds for servo signal (0 degrees)
+#endif
+
+#ifndef SVOMAXPULSE
+ #define SVOMAXPULSE 2500  // maximum pulse width in microseconds for servo signal (for maximum angle)
+#endif
 
 class tinyServo84 {
   public:
