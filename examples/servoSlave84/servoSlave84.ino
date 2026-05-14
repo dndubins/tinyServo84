@@ -26,8 +26,7 @@
 
    Wiring:
    -------
-   ATtiny84 - Uno
-   Pin 10 (PA3) - LED - 220R - GND
+   ATtiny84 - Uno
    Pin 14 - GND
    Pin 7 - SDA (use 10K pullup)
    Pin 9 - SCL (use 10K pullup)
