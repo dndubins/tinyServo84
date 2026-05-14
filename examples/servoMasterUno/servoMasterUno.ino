@@ -13,7 +13,7 @@ Libraries:
 #define PACKET_LEN 7  // length of posArr[] including checkSum at end
 
 // Servo Parameters
-#define ARMSTEPS 5    // servo steps per increment (relates to speed). Default: 2
+#define ARMSTEPS 2    // servo steps per increment (relates to speed). Default: 2
 #define ARMDELAY 10   // delay for servo commands (relates to speed). Default: 20
 
 // ATtiny84 Slave Parameters
