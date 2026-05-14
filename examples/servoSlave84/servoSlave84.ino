@@ -1,5 +1,6 @@
 /* servoSlave84.ino
-   ATtiny84 as an I2C slave. Programmed with servoMasterUno.ino
+   ATtiny84 as an I2C slave. Master sketch: servoMasterUno.ino
+   tinyServo84 version 1.0.4
    Author: David Dubins
    Date: 08-May-26
    Last Updated: 13-May-26
@@ -26,7 +27,8 @@
 
    Wiring:
    -------
-   ATtiny84 - Uno
+   ATtiny84 - Uno
+
    Pin 14 - GND
    Pin 7 - SDA (use 10K pullup)
    Pin 9 - SCL (use 10K pullup)
