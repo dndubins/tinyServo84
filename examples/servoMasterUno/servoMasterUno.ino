@@ -1,5 +1,5 @@
 /* servoMasterUno.ino
-   Uno as an I2C Master, with Attiny84 as slave. Programmed with servoSlave84.ino.
+   Uno as an I2C Master, with Attiny84 as slave. Slave sketch: servoSlave84.ino.
    Author: David Dubins
    Date: 10-Feb-25
    Last Updated: 14-May-26
