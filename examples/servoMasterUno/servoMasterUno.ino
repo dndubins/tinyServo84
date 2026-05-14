@@ -24,11 +24,11 @@ int16_t txCheckSum = 0;  // checksum for communications validation
 
 // Struct to hold servo data
 struct ServoStruct {
-  uint8_t Pin;   // 1 byte - not used in this sketch, just to keep track
-  uint8_t MIN;   // 1 byte
-  uint8_t MAX;   // 1 byte
-  uint8_t HOME;  // 1 byte
-  uint8_t POS;   // keep track of current servo position
+  uint8_t Pin;   // 1 byte - servo pin (not used)
+  uint8_t MIN;   // 1 byte - servo min angle
+  uint8_t MAX;   // 1 byte - servo max angle
+  uint8_t HOME;  // 1 byte - servo home position
+  uint8_t POS;   // 1 byte - current servo position
 } sData[6];      //declare strutured array with 6 servos
 
 uint8_t TXdata[PACKET_LEN];
