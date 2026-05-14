@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #ifndef NSVO
-	#define NSVO 11           // number of servos to control (up to 11)
+ #define NSVO 11           // number of servos to control (up to 11)
 #endif
 
 #ifndef SVOMAXANGLE
