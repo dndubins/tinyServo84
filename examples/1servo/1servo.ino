@@ -1,5 +1,5 @@
 // 1servo.ino: Example sketch for tinyServo84
-// tinySero84 version 1.0.4
+// tinyServo84 version 1.0.4
 // Author: D.Dubins
 // Date: 23-Dec-24
 // Last Updated: 13-May-26
