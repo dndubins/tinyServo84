@@ -3,7 +3,7 @@
    tinyServo84.h version 1.0.4
    Author: David Dubins
    Date: 08-May-26
-   Last Updated: 13-May-26
+   Last Updated: 20-May-26
    Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
    Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-ATtiny84-and-i2c-communication-using-ATtiny84/
 
@@ -62,7 +62,7 @@
 byte s_index[6] = { 1, 2, 3, 5, 7, 10 };  // servo numbers for PCB board (6 of them)
 bool s_active[6] = { 0, 1, 1, 0, 0, 0 };  // active servos for this project (subset)
 
-byte potPin = A7;  // analog reading of pot
+byte potPin = A0;  // analog reading of pot
 
 tinyServo84 myServos;              // declare object called myServos of class tinyServo84
 
@@ -87,7 +87,7 @@ void loop() {  // The slave will continuously wait for requests or data from the
   // Uncomment the following to test servo limits using the onboard potentiometer:
 #ifdef CALIBRATE
   static int lastDiv = -1;
-  int div = map(analogRead(A7), 0, 1023, 0, 179);
+  int div = map(analogRead(potPin), 0, 1023, 0, 179);
   if (abs(div - lastDiv) >= 2) {  // 2-degree deadband
     lastDiv = div;
     for (int i = 0; i < NSERVO; i++) {
