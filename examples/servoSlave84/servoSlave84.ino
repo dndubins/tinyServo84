@@ -59,10 +59,10 @@
 // Map the servos you need here:
 //                        0   1   2   3   4   5   6   7   8   9  10
 //                       PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7 PB0 PB1 PB2
-byte s_index[6] = { 1, 2, 3, 5, 7, 10 };  // servo numbers for PCB board (6 of them)
-bool s_active[6] = { 0, 1, 1, 0, 0, 0 };  // active servos for this project (subset)
+byte s_index[6] = { 1, 2, 3, 5, 7, 10 };  // servo numbers for PCB board (6 of them, expand as needed)
+bool s_active[6] = { 1, 1, 1, 1, 1, 1 };  // active servos for this project (subset, expand as needed)
 
-byte potPin = A0;  // analog reading of pot
+byte potPin = 0;  // analog reading of pot
 
 tinyServo84 myServos;              // declare object called myServos of class tinyServo84
 
