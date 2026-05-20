@@ -3,7 +3,7 @@
    tinyServo84.h version 1.0.4
    Author: David Dubins
    Date: 10-Feb-25
-   Last Updated: 14-May-26
+   Last Updated: 20-May-26
 Libraries:
    Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
    Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-attiny85-and-i2c-communication-using-attiny85/
@@ -96,32 +96,33 @@ bool sendToSlave(uint8_t* a, size_t len) {  // size_t is the variable type retur
 
 // fill values of sData
 void setServos() {   // set up the physical parameters for all servos
-  sData[0].Pin = 1;  //digital pin for Servo (placeholder). Not used in this sketch.
+ //sData[].Pin is digital pin # for Servo (placeholder). Not used in this sketch.
+  sData[0].Pin = 1; //digital pin for Servo (PA1) 
   sData[0].MIN = 5;
   sData[0].MAX = 174;
   sData[0].HOME = 89;
 
   sData[1].Pin = 2;  //digital pin for Servo (PA2)
-  sData[1].MIN = 5;
-  sData[1].MAX = 167;  
-  sData[1].HOME = 96;  
+  sData[1].MIN = 2;
+  sData[1].MAX = 172;  
+  sData[1].HOME = 84;  
 
   sData[2].Pin = 3;  //digital pin for Servo (PA3)
-  sData[2].MIN = 5;
-  sData[2].MAX = 167;
-  sData[2].HOME = 92;
+  sData[2].MIN = 2;
+  sData[2].MAX = 178;
+  sData[2].HOME = 86;
 
-  sData[3].Pin = 5;  //digital pin for Servo
+  sData[3].Pin = 5;  //digital pin for Servo (PA5)
   sData[3].MIN = 5;
-  sData[3].MAX = 167;  
-  sData[3].HOME = 96;  
+  sData[3].MAX = 171;  
+  sData[3].HOME = 77;  
 
-  sData[4].Pin = 7;  //digital pin for Servo
+  sData[4].Pin = 7;  //digital pin for Servo (PA7)
   sData[4].MIN = 5;
-  sData[4].MAX = 167;
-  sData[4].HOME = 92;
+  sData[4].MAX = 170;
+  sData[4].HOME = 41;
 
-  sData[5].Pin = 10;  //digital pin for Servo (placeholder)
+  sData[5].Pin = 8;  //digital pin for Servo (PB2) 
   sData[5].MIN = 5;
   sData[5].MAX = 178;
   sData[5].HOME = 89;
