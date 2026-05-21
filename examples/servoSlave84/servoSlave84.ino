@@ -53,9 +53,8 @@
 #define SVOMINPULSE 700   // minimum pulse width in microseconds for servo signal (0 degrees) Default: 500
 #define SVOMAXPULSE 2300  // maximum pulse width in microseconds for servo signal (for maximum angle) Default: 2500
 #define SVOTIMEOUT 10000  // timeout in ms to disable servos.
-#define ARMDELAY 20       // delay for servo commands (relates to speed). Default: 20
-#define PACKET_LEN 7      // length of posArr[] including checkSum at end
 #define SERVO_DEADBAND 2  // deadband for servo movement. Default: 2
+#define PACKET_LEN 7      // length of posArr[] including checkSum at end
 
 // Map the servos you need here:
 //                        0   1   2   3   4   5   6   7   8   9  10
@@ -108,9 +107,9 @@ void loop() {  // The slave will continuously wait for requests or data from the
     frameReady = false;
     interrupts();
     if(validate_checkSum(RXdata, PACKET_LEN)){
-      // don't nag the servos:
+      // don't nag the servos: (uncomment if slower movement needed)
       /* static unsigned long lastServoUpdate = 0;
-      if(millis() - lastServoUpdate >= 20){
+      if(millis() - lastServoUpdate >= 20){  // change 20 to desired wait
         lastServoUpdate = millis();
         moveTo(RXdata);
       }*/
@@ -161,11 +160,11 @@ void sendCheckSum(uint8_t c) {
 
 // moveTo is as fast as possible (control speed and constrain using the master)
 void moveTo(uint8_t a[]) {  // manually move to a spot
-  static byte lastPos[NSERVO];  // remembers last commanded position
+  static byte lastPos[NSERVO]={255, 255, 255, 255, 255, 255};  // remembers last commanded position
   for (int i = 0; i < NSERVO; i++) {
     if (s_active[i]) {
       byte pos = constrain(a[i], 0, SVOMAXANGLE);  // prevents unreasonable asks
-      if (abs((int)pos - (int)lastPos[i]) > SERVO_DEADBAND) {   // only update if position changed outside of deadband
+      if (lastPos[i] == 255 || abs((int)pos - (int)lastPos[i]) > SERVO_DEADBAND) {   // only update if position changed outside of deadband
         myServos.setServo(s_index[i], pos);
         lastPos[i] = pos;
       }
