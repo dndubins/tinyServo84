@@ -1,9 +1,9 @@
 /* servoSlave84.ino
    ATtiny84 as an I2C slave. Master sketch: servoMasterUno.ino
-   tinyServo84.h version 1.0.4
+   tinyServo84.h version 1.0.5
    Author: David Dubins
    Date: 08-May-26
-   Last Updated: 20-May-26
+   Last Updated: 21-May-26
    Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
    Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-ATtiny84-and-i2c-communication-using-ATtiny84/
 
@@ -50,11 +50,12 @@
 // Change these values to suit your application:
 #define NSERVO 6          // number of servos to control (up to 11)
 #define SVOMAXANGLE 179   // maximum angle for servo.
-#define SVOMINPULSE 500   // minimum pulse width in microseconds for servo signal (0 degrees)
-#define SVOMAXPULSE 2500  // maximum pulse width in microseconds for servo signal (for maximum angle)
+#define SVOMINPULSE 700   // minimum pulse width in microseconds for servo signal (0 degrees) Default: 500
+#define SVOMAXPULSE 2300  // maximum pulse width in microseconds for servo signal (for maximum angle) Default: 2500
 #define SVOTIMEOUT 10000  // timeout in ms to disable servos.
 #define ARMDELAY 20       // delay for servo commands (relates to speed). Default: 20
 #define PACKET_LEN 7      // length of posArr[] including checkSum at end
+#define SERVO_DEADBAND 2  // deadband for servo movement. Default: 2
 
 // Map the servos you need here:
 //                        0   1   2   3   4   5   6   7   8   9  10
@@ -160,10 +161,14 @@ void sendCheckSum(uint8_t c) {
 
 // moveTo is as fast as possible (control speed and constrain using the master)
 void moveTo(uint8_t a[]) {  // manually move to a spot
+  static byte lastPos[NSERVO];  // remembers last commanded position
   for (int i = 0; i < NSERVO; i++) {
     if (s_active[i]) {
       byte pos = constrain(a[i], 0, SVOMAXANGLE);  // prevents unreasonable asks
-      myServos.setServo(s_index[i], pos);
+      if (abs((int)pos - (int)lastPos[i]) > SERVO_DEADBAND) {   // only update if position changed outside of deadband
+        myServos.setServo(s_index[i], pos);
+        lastPos[i] = pos;
+      }
     }
   }
 }
