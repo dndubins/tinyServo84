@@ -5,7 +5,7 @@
 // Transferability: This library is only designed to work on the ATtiny84.
 // Author: D.Dubins
 // Date: 19-Dec-24
-// Last Updated: 14-May-26
+// Last Updated: 21-May-26
 //
 // The library maps specific servo numbers to the following pins:
 // servo 0: PA0   servo 3: PA3   servo 6: PA6   servo 9: PB1
@@ -51,7 +51,8 @@ void tinyServo84::detachServo(byte servo_num) { // function to detach servo
 void tinyServo84::setServo(byte servo_num, int angle) {
   if(!tinyServo84::timer1_enabled)tinyServo84::enableTimerInterrupt();     // enable Timer1 in case it is off (should be on)	
   tinyServo84::servo_output_enabled = true;								   // enable servos in case they timed out
-  int pulse_width = map(angle, 0, SVOMAXANGLE, SVOMINPULSE, SVOMAXPULSE);  // convert angle to pulse width in microseconds
+ // convert angle to pulse width in microseconds:
+  int pulse_width = (int)(SVOMINPULSE + ((long)(SVOMAXPULSE - SVOMINPULSE) * angle + SVOMAXANGLE / 2) / SVOMAXANGLE);
   pulse_width = constrain(pulse_width, SVOMINPULSE, SVOMAXPULSE);          // constrain pulse width to min and max
   if (pulse_width != tinyServo84::servo_PWs[servo_num] && tinyServo84::servo_attached[servo_num]) { // Disable interrupts only if signal changes and servo is attached
     cli();                                                                 // Disable interrupts. It's best to update volatile global variables with interrupts diabled.
@@ -94,7 +95,6 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
   if (busy) return; // prevents early firing of ISR
   if(!tinyServo84::timer1_enabled) return; // if timer1 not enabled, leave.
   busy=true; // ISR has started
-  sei(); // re-enable interrupts so USI/I2C can fire 
   
   // If servos are not enabled, leave safely but keep ISR alive
   if (!tinyServo84::servo_output_enabled) {
@@ -112,6 +112,7 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
   }
   
   // If servos are enabled:
+
   for (byte i = 0; i < NSVO; i++) {    
     if (tinyServo84::servo_attached[i]) { // only turn on pin if servo attached
 	  if (i < 8) {
@@ -121,15 +122,19 @@ ISR(TIM1_COMPA_vect) {  // This is the ISR that will turn off the pins at the co
 	  }
     }
   }
-  while ((TCNT1 * 8) < (SVOMAXPULSE + 100)) {  // multiply TCNT1 by microseconds/step
-    // a 50 Hz pulse has a period of 20,000 us. We just need to make it past SVOMAXPULSE with a small buffer (100 microseconds).
+  
+  bool pinDone[NSVO] = { false };  // track which pins are already low (not static - needs to reset)
+  while (true){
+    unsigned int t = TCNT1 * 8;  // snapshot once — consistent for this iteration
+    if (t >= (SVOMAXPULSE + 100)) break;
     for (byte i = 0; i < NSVO; i++) {
-      if (tinyServo84::servo_attached[i] && (TCNT1 * 8) > tinyServo84::servo_PWs[i]) {   // Turn off the servo pin if the timer exceeds the pulse width
-	    if (i < 8) {
-          PORTA &= ~(1 << (PA0 + i));  // turn off pins in PORTA
-	    } else {
-		  PORTB &= ~(1 << (PB0 + (i - 8)));  // turn off pins in PORTB
-	    }
+      if (!pinDone[i] && tinyServo84::servo_attached[i] && t > tinyServo84::servo_PWs[i]) {
+        if (i < 8) {
+          PORTA &= ~(1 << (PA0 + i));
+        } else {
+          PORTB &= ~(1 << (PB0 + (i - 8)));
+        }
+	    pinDone[i]=true; // don't check this servo again
       }
     }
   }
