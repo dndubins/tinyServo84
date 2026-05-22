@@ -8,17 +8,6 @@
 //   Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
 //   Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-attiny85-and-i2c-communication-using-attiny85/
 
-uint8_t RFdata[7];  // this is our RF data packed into a 7-element array. The last element is a checksum:
-// RFdata[0] is LX
-// RFdata[1] is LY
-// RFdata[2] is LB
-// RFdata[3] is RX
-// RFdata[4] is RY
-// RFdata[5] is RB
-// RFdata[6] is checkSum
-
-enum ServoId { LX, LY, LB, RX, RY, RB, CHECKSUM }; // for more intelligible indexing
-
 #define SERIALDEBUG
 //#define CALIBRATE     // asks for and expects entire position array from slave
 #define PACKET_LEN 7  // length of posArr[] including checkSum at end
@@ -40,8 +29,10 @@ struct ServoStruct {
   uint8_t POS;   // keep track of current servo position
 } sData[6];      //declare strutured array with 6 servos
 
+// Servo data to send to ATtiny84 over I2C
 uint8_t TXdata[PACKET_LEN];
 uint8_t RXdata[PACKET_LEN];
+enum ServoId { LX, LY, LB, RX, RY, RB, CHECKSUM }; // for more intelligible indexing
 
 int checktot = 0;     // to check if motion is required
 int checklast = 0;
@@ -102,7 +93,7 @@ bool sendToSlave(uint8_t* a, size_t len) {  // size_t is the variable type retur
 }
 
 // fill values of sData
-void setServos() {   // set up the physical parameters for all servos
+void setServos() {   //set up the physical parameters for all servos
                      //sData[].Pin is digital pin # for Servo (placeholder). Not used in this sketch.
   sData[0].Pin = 1;  //digital pin for Servo (PA1)
   sData[0].MIN = 5;
