@@ -75,12 +75,6 @@ void setup() {
   TinyWireS.onReceive(receiveEvent);
   TinyWireS.onRequest(requestEvent);
   myServos.setCTC();  // set CTC mode for Timer 1
-  // Attach the active servos here:
-  for (int i = 0; i < NSERVO; i++) {
-    if (s_active[i]) {
-      myServos.attachServo(s_index[i]);
-    }
-  }
 }
 
 void loop() {  // The slave will continuously wait for requests or data from the master.
@@ -160,11 +154,15 @@ void sendCheckSum(uint8_t c) {
 
 // moveTo is as fast as possible (control speed and constrain using the master)
 void moveTo(uint8_t a[]) {  // manually move to a spot
-  static byte lastPos[NSERVO]={255, 255, 255, 255, 255, 255};  // remembers last commanded position
+  static byte lastPos[NSERVO] = {255, 255, 255, 255, 255, 255};  // remembers last commanded position
   for (int i = 0; i < NSERVO; i++) {
     if (s_active[i]) {
       byte pos = constrain(a[i], 0, SVOMAXANGLE);  // prevents unreasonable asks
-      if (lastPos[i] == 255 || abs((int)pos - (int)lastPos[i]) > SERVO_DEADBAND) {   // only update if position changed outside of deadband
+      if (lastPos[i] == 255){ // attach servos on first moveTo() call
+        myServos.attachServo(s_index[i]);  // attach on first command only
+        myServos.setServo(s_index[i], pos);
+        lastPos[i] = pos;
+      } else if(abs((int)pos - (int)lastPos[i]) > SERVO_DEADBAND) {   // only update if position changed outside of deadband
         myServos.setServo(s_index[i], pos);
         lastPos[i] = pos;
       }
