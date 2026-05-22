@@ -1,21 +1,29 @@
-/* servoMasterUno.ino
-   Uno as an I2C Master, with Attiny84 as slave. Slave sketch: servoSlave84.ino.
-   tinyServo84.h version 1.0.4
-   Author: David Dubins
-   Date: 10-Feb-25
-   Last Updated: 20-May-26
-Libraries:
-   Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
-   Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-attiny85-and-i2c-communication-using-attiny85/
-*/
+// servoMasterUno.ino
+// Uno as an I2C Master, with Attiny84 as slave. Slave sketch: servoSlave84.ino.
+// tinyServo84.h version 1.0.5
+// Author: David Dubins
+// Date: 10-Feb-25
+// Last Updated: 21-May-26
+// Libraries:
+//   Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
+//   Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-attiny85-and-i2c-communication-using-attiny85/
+
+uint8_t RFdata[7];  // this is our RF data packed into a 7-element array. The last element is a checksum:
+// RFdata[0] is LX
+// RFdata[1] is LY
+// RFdata[2] is LB
+// RFdata[3] is RX
+// RFdata[4] is RY
+// RFdata[5] is RB
+// RFdata[6] is checkSum
+
+enum ServoId { LX, LY, LB, RX, RY, RB, CHECKSUM }; // for more intelligible indexing
 
 #define SERIALDEBUG
 //#define CALIBRATE     // asks for and expects entire position array from slave
 #define PACKET_LEN 7  // length of posArr[] including checkSum at end
-
 // Servo Parameters
-#define ARMSTEPS 2    // servo steps per increment (relates to speed). Default: 2
-#define ARMDELAY 10   // delay for servo commands (relates to speed). Default: 20
+#define STEPDELAY 10  // delay for servo commands (relates to speed). Default: 50
 
 // ATtiny84 Slave Parameters
 #include <Wire.h>        // start Wire.h as master (no address needed)
@@ -23,29 +31,28 @@ Libraries:
 bool rcv = false;        // flag for new received data
 int16_t txCheckSum = 0;  // checksum for communications validation
 
-// Struct to hold servo data
+// Structure to hold servo data
 struct ServoStruct {
-  uint8_t Pin;   // 1 byte - servo pin (not used)
-  uint8_t MIN;   // 1 byte - servo min angle
-  uint8_t MAX;   // 1 byte - servo max angle
-  uint8_t HOME;  // 1 byte - servo home position
-  uint8_t POS;   // 1 byte - current servo position
+  uint8_t Pin;   // not used in this sketch, just to keep track
+  uint8_t MIN;   // minimum servo position
+  uint8_t MAX;   // maximum servo position
+  uint8_t HOME;  // home servo position
+  uint8_t POS;   // keep track of current servo position
 } sData[6];      //declare strutured array with 6 servos
 
 uint8_t TXdata[PACKET_LEN];
 uint8_t RXdata[PACKET_LEN];
 
-int checktot=0; // to check if motion is required
-int checklast=0;
-unsigned long buttonTimer = 0; // time button pushes to prevent rapid toggling
-unsigned long servoTimer = 0; // to time servo movements
+int checktot = 0;     // to check if motion is required
+int checklast = 0;
 
 void setup() {
-  Wire.begin();                   // Initialize I2C as master
-  Wire.setClock(50000);           // slower clock speed
-  Serial.begin(115200);           // Start serial communication
-  setServos();                    // initialize sData[] with correct values (copy of this is on slave)
+  Wire.begin();  // Initialize I2C as master
+  //Wire.setClock(50000);           // slower clock speed
+  Serial.begin(115200);  // Start serial communication
+  setServos();           // initialize sData[] with correct values
   Serial.println("Master ready.");  // send welcome msg
+  homeServos();
 }
 
 void loop() {
@@ -59,13 +66,13 @@ void loop() {
   delay(500);  // Small delay to avoid overloading the slave
 #else          // Regular routine
   Serial.println("MIN:");
-  moveTo(0, sData[1].MIN, sData[2].MIN, 0, 0, 0, ARMDELAY);  // move to first location
-  printLoc(TXdata);                                          // Print the sent struct
+  moveTo(sData[0].MIN, sData[1].HOME, sData[2].HOME, sData[3].HOME, sData[4].HOME, sData[5].HOME, STEPDELAY);  // move to first location
+  printLoc(TXdata);                                          // Print the sent coordinates
   delay(1000);                                               // wait between receiving and sending
 
   Serial.println("MAX:");
-  moveTo(0, sData[1].MAX, sData[2].MAX, 0, 0, 0, ARMDELAY);  // move to second location
-  //printLoc(TXdata);                                        // Print the sent struct
+  moveTo(sData[0].MAX, sData[1].HOME, sData[2].HOME, sData[3].HOME, sData[4].HOME, sData[5].HOME, STEPDELAY);  // move to first location
+  printLoc(TXdata);                                          // Print the sent coordinates
   delay(1000);                                               // wait between receiving and sending
 #endif
 }
@@ -96,36 +103,36 @@ bool sendToSlave(uint8_t* a, size_t len) {  // size_t is the variable type retur
 
 // fill values of sData
 void setServos() {   // set up the physical parameters for all servos
- //sData[].Pin is digital pin # for Servo (placeholder). Not used in this sketch.
-  sData[0].Pin = 1; //digital pin for Servo (PA1) 
+                     //sData[].Pin is digital pin # for Servo (placeholder). Not used in this sketch.
+  sData[0].Pin = 1;  //digital pin for Servo (PA1)
   sData[0].MIN = 5;
   sData[0].MAX = 174;
-  sData[0].HOME = 89;
+  sData[0].HOME = 69;
 
   sData[1].Pin = 2;  //digital pin for Servo (PA2)
   sData[1].MIN = 2;
-  sData[1].MAX = 172;  
-  sData[1].HOME = 84;  
+  sData[1].MAX = 172;
+  sData[1].HOME = 76;
 
   sData[2].Pin = 3;  //digital pin for Servo (PA3)
   sData[2].MIN = 2;
   sData[2].MAX = 178;
-  sData[2].HOME = 86;
+  sData[2].HOME = 90;
 
   sData[3].Pin = 5;  //digital pin for Servo (PA5)
   sData[3].MIN = 5;
-  sData[3].MAX = 171;  
-  sData[3].HOME = 77;  
+  sData[3].MAX = 171;
+  sData[3].HOME = 74;
 
   sData[4].Pin = 7;  //digital pin for Servo (PA7)
   sData[4].MIN = 5;
   sData[4].MAX = 170;
-  sData[4].HOME = 41;
+  sData[4].HOME = 45;
 
-  sData[5].Pin = 8;  //digital pin for Servo (PB2) 
-  sData[5].MIN = 5;
-  sData[5].MAX = 178;
-  sData[5].HOME = 89;
+  sData[5].Pin = 8;  //digital pin for Servo (PB2)
+  sData[5].MIN = 119; // 118 abolute min (claw open)
+  sData[5].MAX = 170; // 172 absolute max (claw closed)
+  sData[5].HOME = 120; // use min
 
   // set inital position of servos
   for (int i = 0; i < 6; i++) {
@@ -140,6 +147,7 @@ void printLoc(uint8_t* pos) {  // print location to serial monitor
   }
 }
 
+
 // linear moveTo() routine
 void moveTo(byte SV0, byte SV1, byte SV2, byte SV3, byte SV4, byte SV5, int sSpeed) {  // manually move to a spot
   byte S[6] = { SV0, SV1, SV2, SV3, SV4, SV5 };
@@ -152,20 +160,19 @@ void moveTo(byte SV0, byte SV1, byte SV2, byte SV3, byte SV4, byte SV5, int sSpe
     dev = 0;
     for (int i = 0; i < 6; i++) {
       delta[i] = 0;
-      if (S[i] > sData[i].POS) delta[i] += 1;
+      if (S[i] > sData[i].POS) delta[i] += 1;  // Can't use STEPSIZE here or dev can't be zero
       if (S[i] < sData[i].POS) delta[i] -= 1;
       sData[i].POS = constrain(sData[i].POS + delta[i], sData[i].MIN, sData[i].MAX);
       TXdata[i] = sData[i].POS;
       dev += abs(sData[i].POS - S[i]);
     }
-    calculate_checkSum(TXdata, PACKET_LEN);     // calculate the checksum. Change payload manually here (7 int numbers in payload)
-    txCheckSum = TXdata[PACKET_LEN - 1];        // store txCheckSum before sending
-    if (!sendToSlave(TXdata,sizeof(TXdata))) {  // Send TXdata to slave
+    calculate_checkSum(TXdata, PACKET_LEN);      // calculate the checksum. Change payload manually here (7 int numbers in payload)
+    txCheckSum = TXdata[PACKET_LEN - 1];         // store txCheckSum before sending
+    if (!sendToSlave(TXdata, sizeof(TXdata))) {  // Send TXdata to slave
 #ifdef SERIALDEBUG
       Serial.println("Communications error sending data to slave.");
 #endif
     }
-
     delay(sSpeed);  //give a chance to get to setpoint
   } while (dev != 0);
 #ifdef SERIALDEBUG
@@ -194,9 +201,9 @@ void moveTo_smooth(byte SV0, byte SV1, byte SV2, byte SV3, byte SV4, byte SV5, i
   }
   // number of interpolation steps
   int steps = maxDelta;
-  if (steps==0)return; // leave if not moving anywhere
+  if (steps == 0) return;  // leave if not moving anywhere
   for (int step = 0; step <= steps; step++) {
-    // normalized 0â1
+    // normalized 0→1
     float t = (float)step / steps;
     // smoothstep easing
     //float ease = t * t * (3.0 - 2.0 * t);
@@ -215,6 +222,9 @@ void moveTo_smooth(byte SV0, byte SV1, byte SV2, byte SV3, byte SV4, byte SV5, i
 #endif
     }
     delay(sSpeed);
+  }
+  for (int i = 0; i < 6; i++) {
+    sData[i].POS = target[i];  // snap to exact target
   }
 }
 
@@ -236,9 +246,8 @@ bool validate_checkSum(uint8_t a[], uint8_t size) {
   return (a[size - 1] == (sum % 256));  // return result of checksum
 }
 
-void homeArm(){ //home the arm
-  Serial.println("***** Homing arm. *****");
-
- moveTo(sData[0].HOME,sData[1].HOME,sData[2].HOME,sData[3].HOME,sData[4].HOME,sData[5].HOME,50); //Home slowly
+void homeServos() {  //home the servos
+  Serial.println("***** Homing servos. *****");
+  moveTo(sData[0].HOME, sData[1].HOME, sData[2].HOME, sData[3].HOME, sData[4].HOME, sData[5].HOME, 50);  //Home slowly
   Serial.println("Finished homing.");
 }
