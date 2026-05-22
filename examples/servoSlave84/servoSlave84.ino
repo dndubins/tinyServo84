@@ -75,6 +75,9 @@ void setup() {
   TinyWireS.onReceive(receiveEvent);
   TinyWireS.onRequest(requestEvent);
   myServos.setCTC();  // set CTC mode for Timer 1
+  // NOTE: servos are intentionally NOT attached here.
+  // attachServo() is called lazily in moveTo() on first valid I2C command.
+  // This prevents uncontrolled movement on power-up.
 }
 
 void loop() {  // The slave will continuously wait for requests or data from the master.
