@@ -52,8 +52,8 @@
 #define SVOMAXANGLE 179   // maximum angle for servo.
 #define SVOMINPULSE 700   // minimum pulse width in microseconds for servo signal (0 degrees) Default: 500
 #define SVOMAXPULSE 2300  // maximum pulse width in microseconds for servo signal (for maximum angle) Default: 2500
-#define SVOTIMEOUT 10000  // timeout in ms to disable servos.
-#define SERVO_DEADBAND 2  // deadband for servo movement. Default: 2
+#define SVOTIMEOUT 20000  // timeout in ms to disable servos (Default: 20000 = 20 sec).
+#define SERVO_DEADBAND 1  // deadband for servo movement. Default: 1
 #define PACKET_LEN 7      // length of posArr[] including checkSum at end
 
 // Map the servos you need here:
@@ -119,7 +119,7 @@ void loop() {  // The slave will continuously wait for requests or data from the
 #endif
   TinyWireS_stop_check();  // detect I2C STOP and reset USI state (needs to be in the loop)
   //comment the next line out to disable servo timeouts:
-  myServos.servo_timeout_check(SVOTIMEOUT);  // if servos are inactive, stop servos
+  myServos.servo_timeout_check(SVOTIMEOUT);  // if servos are inactive, stop servos. Comment out for RC applications - keep servos live.
 }
 
 // Function to handle data received from the master
