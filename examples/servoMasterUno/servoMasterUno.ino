@@ -1,6 +1,6 @@
 // servoMasterUno.ino
 // Uno as an I2C Master, with Attiny84 as slave. Slave sketch: servoSlave84.ino.
-// tinyServo84.h version 1.0.5
+// tinyServo84.h version 1.0.6
 // Author: David Dubins
 // Date: 10-Feb-25
 // Last Updated: 01-Jun-26
