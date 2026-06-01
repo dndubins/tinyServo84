@@ -96,44 +96,44 @@ bool sendToSlave(uint8_t* a, size_t len) {  // size_t is the variable type retur
 void setServos() {   //set up the physical parameters for all servos
                      //sData[].Pin is digital pin # for Servo (placeholder). Not used in this sketch.
   sData[0].Pin = 1;  //digital pin for Servo (PA1)
-  sData[0].MIN = 5;
-  sData[0].MAX = 174;
-  sData[0].HOME = 69;
+  sData[0].MIN = 32; //change these limits for the physical limits of each servo in your project
+  sData[0].MAX = 106;
+  sData[0].HOME = 90;
 
   sData[1].Pin = 2;  //digital pin for Servo (PA2)
-  sData[1].MIN = 2;
-  sData[1].MAX = 172;
-  sData[1].HOME = 76;
+  sData[1].MIN = 32;
+  sData[1].MAX = 106;
+  sData[1].HOME = 90;
 
   sData[2].Pin = 3;  //digital pin for Servo (PA3)
-  sData[2].MIN = 2;
-  sData[2].MAX = 178;
+  sData[2].MIN = 32;
+  sData[2].MAX = 106;
   sData[2].HOME = 90;
 
   sData[3].Pin = 5;  //digital pin for Servo (PA5)
-  sData[3].MIN = 5;
-  sData[3].MAX = 171;
-  sData[3].HOME = 74;
+  sData[3].MIN = 32;
+  sData[3].MAX = 106;
+  sData[3].HOME = 90;
 
   sData[4].Pin = 7;  //digital pin for Servo (PA7)
-  sData[4].MIN = 5;
-  sData[4].MAX = 170;
-  sData[4].HOME = 45;
+  sData[4].MIN = 32;
+  sData[4].MAX = 106;
+  sData[4].HOME = 90;
 
   sData[5].Pin = 8;  //digital pin for Servo (PB0)
-  sData[5].MIN = 5;
-  sData[5].MAX = 170;
-  sData[5].HOME = 45;
+  sData[5].MIN = 32;
+  sData[5].MAX = 106;
+  sData[5].HOME = 90;
 
   sData[6].Pin = 9;  //digital pin for Servo (PB1)
-  sData[6].MIN = 5;
-  sData[6].MAX = 170;
-  sData[6].HOME = 45;
+  sData[6].MIN = 32;
+  sData[6].MAX = 106;
+  sData[6].HOME = 90;
 
   sData[7].Pin = 10;  //digital pin for Servo (PB2)
-  sData[7].MIN = 5;
-  sData[7].MAX = 170;
-  sData[7].HOME = 45;
+  sData[7].MIN = 32;
+  sData[7].MAX = 106;
+  sData[7].HOME = 90;
 
   // set inital position of servos
   for (int i = 0; i < NSERVO; i++) {
