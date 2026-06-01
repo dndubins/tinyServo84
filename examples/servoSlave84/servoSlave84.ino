@@ -3,7 +3,7 @@
    tinyServo84.h version 1.0.5
    Author: David Dubins
    Date: 08-May-26
-   Last Updated: 22-May-26
+   Last Updated: 01-Jun-26
    Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
    Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-ATtiny84-and-i2c-communication-using-ATtiny84/
 
@@ -59,8 +59,8 @@
 // Map the servos you need here:
 //                        0   1   2   3   4   5   6   7   8   9  10
 //                       PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7 PB0 PB1 PB2
-byte s_index[6] = { 1, 2, 3, 5, 7, 10 };  // servo numbers for PCB board (6 of them, expand as needed)
-bool s_active[6] = { 1, 1, 1, 1, 1, 1 };  // active servos for this project (subset, expand as needed)
+byte s_index[NSERVO] = { 1, 2, 3, 5, 7, 10, 9, 8 };  // servo numbers for PCB board (modify needed)
+bool s_active[NSERVO] = { 1, 1, 1, 1, 1, 1, 1, 1 };  // active servos for this project (subset, mark active servos with 1, others with 0)
 
 byte potPin = 0;  // analog reading of pot
 
