@@ -59,7 +59,7 @@
 // Map the servos you need here:
 //                        0   1   2   3   4   5   6   7   8   9  10
 //                       PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7 PB0 PB1 PB2
-byte s_index[NSERVO] = { 1, 2, 3, 5, 7, 8, 9, 10 };  // servo numbers for PCB board (6 of them, expand as needed)
+byte s_index[NSERVO] = { 1, 2, 3, 5, 7, 8, 9, 10 };  // servo numbers for PCB board - these should be in ascending order
 bool s_active[NSERVO] = { 1, 1, 1, 1, 1, 1, 1, 1 };  // active servos for this project (subset, expand as needed)
 
 byte potPin = 0;  // analog reading of pot
