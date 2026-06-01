@@ -71,7 +71,7 @@ void tinyServo84::homeServos() {  // function to home servos
 }
 
 void tinyServo84::setCTC() {  // function to set the registers of the ATtiny84 for Timer 1 CTC mode
-  // Setting up Timer1 for 1µs ticks (assuming 8MHz clock)
+  // Setting up Timer1 for 8µs ticks (assuming 8MHz clock)
   cli();		      // stop interrupts
   TCCR1A = 0;		  // clear timer control register A
   TCCR1B = 0;		  // clear timer control register B
