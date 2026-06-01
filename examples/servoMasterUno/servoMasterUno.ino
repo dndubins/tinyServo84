@@ -3,14 +3,14 @@
 // tinyServo84.h version 1.0.5
 // Author: David Dubins
 // Date: 10-Feb-25
-// Last Updated: 21-May-26
+// Last Updated: 01-Jun-26
 // Libraries:
 //   Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
 //   Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-attiny85-and-i2c-communication-using-attiny85/
 
 #define SERIALDEBUG
 //#define CALIBRATE     // asks for and expects entire position array from slave
-#define PACKET_LEN 7  // length of posArr[] including checkSum at end
+#define PACKET_LEN 9  // length of posArr[] including checkSum at end
 // Servo Parameters
 #define STEPDELAY 10  // delay for servo commands (relates to speed). Default: 50
 
@@ -132,9 +132,9 @@ void setServos() {   //set up the physical parameters for all servos
 }
 
 void printLoc(uint8_t* pos) {  // print location to serial monitor
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < (PACKET_LEN - 1); i++) {
     Serial.print(pos[i]);
-    (i < 5) ? Serial.print(", ") : Serial.println("");
+    (i < (PACKET_LEN - 2)) ? Serial.print(", ") : Serial.println("");
   }
 }
 
