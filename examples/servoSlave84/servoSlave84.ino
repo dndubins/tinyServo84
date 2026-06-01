@@ -3,7 +3,7 @@
    tinyServo84.h version 1.0.5
    Author: David Dubins
    Date: 08-May-26
-   Last Updated: 01-Jun-26
+   Last Updated: 21-May-26
    Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
    Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-ATtiny84-and-i2c-communication-using-ATtiny84/
 
@@ -41,26 +41,26 @@
  */
 
 // I2C parameters
-//#define CALIBRATE  // if defined, returns the whole posArr[] to the master
+//#define CALIBRATE  // if defined, returns the whole position array to the master
 #include <TinyWireS.h>
 #define I2C_ADDR 0x08  // ATtiny84 I2C Address
 
 // Servo parameters
 #include <tinyServo84.h>
 // Change these values to suit your application:
-#define NSERVO 6          // number of servos to control (up to 11)
+#define NSERVO 8          // number of servos to control (up to 11)
 #define SVOMAXANGLE 179   // maximum angle for servo.
 #define SVOMINPULSE 700   // minimum pulse width in microseconds for servo signal (0 degrees) Default: 500
 #define SVOMAXPULSE 2300  // maximum pulse width in microseconds for servo signal (for maximum angle) Default: 2500
 #define SVOTIMEOUT 20000  // timeout in ms to disable servos (Default: 20000 = 20 sec).
 #define SERVO_DEADBAND 1  // deadband for servo movement. Default: 1
-#define PACKET_LEN 7      // length of posArr[] including checkSum at end
+#define PACKET_LEN 9      // length of position array including checkSum at end
 
 // Map the servos you need here:
 //                        0   1   2   3   4   5   6   7   8   9  10
 //                       PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7 PB0 PB1 PB2
-byte s_index[NSERVO] = { 1, 2, 3, 5, 7, 10, 9, 8 };  // servo numbers for PCB board (modify needed)
-bool s_active[NSERVO] = { 1, 1, 1, 1, 1, 1, 1, 1 };  // active servos for this project (subset, mark active servos with 1, others with 0)
+byte s_index[NSERVO] = { 1, 2, 3, 5, 7, 8, 9, 10 };  // servo numbers for PCB board (6 of them, expand as needed)
+bool s_active[NSERVO] = { 1, 1, 1, 1, 1, 1, 1, 1 };  // active servos for this project (subset, expand as needed)
 
 byte potPin = 0;  // analog reading of pot
 
@@ -75,9 +75,12 @@ void setup() {
   TinyWireS.onReceive(receiveEvent);
   TinyWireS.onRequest(requestEvent);
   myServos.setCTC();  // set CTC mode for Timer 1
-  // NOTE: servos are intentionally NOT attached here.
-  // attachServo() is called lazily in moveTo() on first valid I2C command.
-  // This prevents uncontrolled movement on power-up.
+  // Attach the active servos here:
+  for (int i = 0; i < NSERVO; i++) {
+    if (s_active[i]) {
+      myServos.attachServo(s_index[i]);
+    }
+  }
 }
 
 void loop() {  // The slave will continuously wait for requests or data from the master.
@@ -157,15 +160,11 @@ void sendCheckSum(uint8_t c) {
 
 // moveTo is as fast as possible (control speed and constrain using the master)
 void moveTo(uint8_t a[]) {  // manually move to a spot
-  static byte lastPos[NSERVO] = {255, 255, 255, 255, 255, 255};  // remembers last commanded position
+  static byte lastPos[NSERVO]={255, 255, 255, 255, 255, 255, 255, 255};  // remembers last commanded position
   for (int i = 0; i < NSERVO; i++) {
     if (s_active[i]) {
       byte pos = constrain(a[i], 0, SVOMAXANGLE);  // prevents unreasonable asks
-      if (lastPos[i] == 255){ // attach servos on first moveTo() call
-        myServos.attachServo(s_index[i]);  // attach on first command only
-        myServos.setServo(s_index[i], pos);
-        lastPos[i] = pos;
-      } else if(abs((int)pos - (int)lastPos[i]) > SERVO_DEADBAND) {   // only update if position changed outside of deadband
+      if (lastPos[i] == 255 || abs((int)pos - (int)lastPos[i]) > SERVO_DEADBAND) {   // only update if position changed outside of deadband
         myServos.setServo(s_index[i], pos);
         lastPos[i] = pos;
       }
