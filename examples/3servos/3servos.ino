@@ -1,5 +1,5 @@
 // 3servos.ino: Example sketch for tinyServo84
-// tinyServo84.h version 1.0.5
+// tinyServo84.h version 1.0.6
 // Author: D. Dubins
 // Date: 23-Dec-24
 // Last Updated: 13-May-26
