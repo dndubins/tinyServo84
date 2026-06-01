@@ -32,7 +32,6 @@ struct ServoStruct {
 // Servo data to send to ATtiny84 over I2C
 uint8_t TXdata[PACKET_LEN];
 uint8_t RXdata[PACKET_LEN];
-enum ServoId { LX, LY, LB, RX, RY, RB, CHECKSUM }; // for more intelligible indexing
 
 int checktot = 0;     // to check if motion is required
 int checklast = 0;
