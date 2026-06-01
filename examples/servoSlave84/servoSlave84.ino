@@ -3,7 +3,7 @@
    tinyServo84.h version 1.0.5
    Author: David Dubins
    Date: 08-May-26
-   Last Updated: 21-May-26
+   Last Updated: 01-Jun-26
    Written to work with TinyWireS.h available here: https://github.com/rambo/TinyWire
    Adapted from: https://pwbotics.wordpress.com/2021/05/05/programming-ATtiny84-and-i2c-communication-using-ATtiny84/
 
