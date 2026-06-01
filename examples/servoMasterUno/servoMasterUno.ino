@@ -28,7 +28,7 @@ struct ServoStruct {
   uint8_t MAX;    // maximum servo position
   uint8_t HOME;   // home servo position
   uint8_t POS;    // keep track of current servo position
-} sData[NSERVO];  //declare strutured array with 6 servos
+} sData[NSERVO];  // declare strutured array with 6 servos
 
 // Servo data to send to ATtiny84 over I2C
 uint8_t TXdata[PACKET_LEN];
